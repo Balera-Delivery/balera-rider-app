@@ -47,8 +47,8 @@ extension DeliveryStatusExtension on DeliveryStatus {
       case DeliveryStatus.pickedUp:
         return 'PICKED_UP';
       case DeliveryStatus.onTheWay:
-      case DeliveryStatus.arrivedAtLocation:
         return 'ON_THE_WAY';
+      case DeliveryStatus.arrivedAtLocation:
       case DeliveryStatus.delivered:
         return 'DELIVERED';
       case DeliveryStatus.completed:
