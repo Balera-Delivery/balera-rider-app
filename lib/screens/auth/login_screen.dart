@@ -17,10 +17,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _phoneController =
-      TextEditingController(text: '+251 911 000 001');
-  final TextEditingController _passwordController =
-      TextEditingController(text: 'RiderPass@123');
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
   bool _isLoading = false;
@@ -78,6 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final phoneCtrl = TextEditingController(text: '+251');
     final vehicleCtrl = TextEditingController(text: 'TVS Motorcycle Plate AA-');
     final passCtrl = TextEditingController();
+    bool obscureRegisterPass = true;
     bool isRegistering = false;
     String? modalError;
 
@@ -177,10 +176,30 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: passCtrl,
-                  obscureText: true,
+                  obscureText: obscureRegisterPass,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  cursorColor: AppColors.primary,
+                  textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
                     labelText: 'Password (Required)',
+                    hintText: 'Enter a secure password',
                     prefixIcon: const Icon(Icons.lock_outline_rounded),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscureRegisterPass
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: AppColors.textSecondary,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        setModalState(() {
+                          obscureRegisterPass = !obscureRegisterPass;
+                        });
+                      },
+                      tooltip: obscureRegisterPass ? 'Show password' : 'Hide password',
+                    ),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
@@ -589,6 +608,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: TextField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  cursorColor: AppColors.primary,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => _handleLogin(),
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -607,13 +631,42 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {
                         setState(() => _obscurePassword = !_obscurePassword);
                       },
+                      tooltip: _obscurePassword ? 'Show password' : 'Hide password',
                     ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 12),
+
+              // Demo credentials helper
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _phoneController.text = '+251 911 000 001';
+                      _passwordController.text = 'RiderPass@123';
+                    });
+                  },
+                  icon: const Icon(Icons.auto_fix_high_rounded, size: 14, color: AppColors.primary),
+                  label: const Text(
+                    'Fill Demo Rider (+251 911 000 001)',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
 
               // Login Button
               CustomButton(
