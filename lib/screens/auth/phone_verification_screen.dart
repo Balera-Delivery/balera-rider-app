@@ -112,7 +112,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
               ],
             ),
             content: const Text(
-              'Your phone number has been verified successfully. Your rider application is now under admin review. Once approved, you can log in.',
+              'Your phone number has been verified successfully. Your account is activated and ready. You can now log in.',
               style: TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.4),
             ),
             actions: [

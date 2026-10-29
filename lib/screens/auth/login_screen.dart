@@ -211,18 +211,25 @@ class _LoginScreenState extends State<LoginScreen> {
                               vehicleInfo: vehicleCtrl.text.trim().isNotEmpty ? vehicleCtrl.text.trim() : null,
                             );
                             if (context.mounted) {
+                              final registeredPhone = phoneCtrl.text.trim();
                               Navigator.pop(ctx);
                               // Route immediately to PhoneVerificationScreen
-                              Navigator.push(
+                              final verified = await Navigator.push<bool>(
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => PhoneVerificationScreen(
-                                    phoneNumber: phoneCtrl.text.trim(),
+                                    phoneNumber: registeredPhone,
                                     initialMessage: res['message']?.toString(),
                                     devOtp: res['devOtp']?.toString(),
                                   ),
                                 ),
                               );
+                              if (context.mounted && verified == true) {
+                                setState(() {
+                                  _phoneController.text = registeredPhone;
+                                  _passwordController.clear();
+                                });
+                              }
                             }
                           } catch (err) {
                             setModalState(() {
