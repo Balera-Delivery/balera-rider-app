@@ -28,7 +28,14 @@ class DeliveryService extends ChangeNotifier {
 
   RiderProfile get riderProfile => _riderProfile;
   List<DeliveryOrder> get deliveries => _deliveries;
-  List<DeliveryOrder> get historyDeliveries => _historyDeliveries;
+  List<DeliveryOrder> get historyDeliveries => _historyDeliveries.isNotEmpty
+      ? _historyDeliveries
+      : _deliveries
+          .where((d) =>
+              d.status == DeliveryStatus.completed ||
+              d.status == DeliveryStatus.delivered ||
+              d.status == DeliveryStatus.cancelled)
+          .toList();
   List<NotificationItem> get notifications => _notifications;
   bool get isLoadingDeliveries => _isLoadingDeliveries;
   bool get isLoadingHistory => _isLoadingHistory;
@@ -51,15 +58,6 @@ class DeliveryService extends ChangeNotifier {
 
   List<DeliveryOrder> get cancelledDeliveries =>
       _deliveries.where((d) => d.status == DeliveryStatus.cancelled).toList();
-
-  List<DeliveryOrder> get historyDeliveries => _historyDeliveries.isNotEmpty
-      ? _historyDeliveries
-      : _deliveries
-          .where((d) =>
-              d.status == DeliveryStatus.completed ||
-              d.status == DeliveryStatus.delivered ||
-              d.status == DeliveryStatus.cancelled)
-          .toList();
 
   DeliveryOrder? get currentDelivery => _currentActiveDelivery ?? (activeDeliveries.isNotEmpty ? activeDeliveries.first : null);
 

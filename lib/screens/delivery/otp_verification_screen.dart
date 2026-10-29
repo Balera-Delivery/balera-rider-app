@@ -390,7 +390,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   MobileScanner(
                     controller: _scannerController!,
                     onDetect: _onQrDetected,
-                    errorBuilder: (context, error) {
+                    errorBuilder: (context, error, child) {
                       return Center(
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),
