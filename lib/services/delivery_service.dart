@@ -52,6 +52,15 @@ class DeliveryService extends ChangeNotifier {
   List<DeliveryOrder> get cancelledDeliveries =>
       _deliveries.where((d) => d.status == DeliveryStatus.cancelled).toList();
 
+  List<DeliveryOrder> get historyDeliveries => _historyDeliveries.isNotEmpty
+      ? _historyDeliveries
+      : _deliveries
+          .where((d) =>
+              d.status == DeliveryStatus.completed ||
+              d.status == DeliveryStatus.delivered ||
+              d.status == DeliveryStatus.cancelled)
+          .toList();
+
   DeliveryOrder? get currentDelivery => _currentActiveDelivery ?? (activeDeliveries.isNotEmpty ? activeDeliveries.first : null);
 
   void _initDefaults() {
@@ -288,6 +297,35 @@ class DeliveryService extends ChangeNotifier {
     }
   }
 
+  // 10b. Verify QR Code Token to complete delivery (POST /api/v1/rider/deliveries/{id}/verify-qr)
+  Future<bool> verifyQrCode(String deliveryId, String qrCodeToken) async {
+    try {
+      await _apiClient.post(
+        ApiConstants.verifyDeliveryQr(deliveryId),
+        body: {'qrCodeToken': qrCodeToken.trim()},
+      );
+
+      // Update local state
+      final index = _deliveries.indexWhere((d) => d.id == deliveryId);
+      if (index != -1) {
+        _deliveries[index].status = DeliveryStatus.completed;
+      }
+      if (_currentActiveDelivery != null && _currentActiveDelivery!.id == deliveryId) {
+        _currentActiveDelivery = null;
+      }
+
+      _riderProfile.todayCompleted += 1;
+      _riderProfile.totalDeliveries += 1;
+
+      notifyListeners();
+      await fetchDeliveryHistory();
+      await fetchAssignedDeliveries();
+      return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // 11. Fetch Delivery History (GET /api/v1/rider/history)
   Future<void> fetchDeliveryHistory({int page = 1, int limit = 20}) async {
     _isLoadingHistory = true;
@@ -366,6 +404,24 @@ class DeliveryService extends ChangeNotifier {
 
     try {
       await _apiClient.put(ApiConstants.markAllNotificationsRead);
+    } catch (_) {}
+  }
+
+  // 15. Delete Single Notification (DELETE /api/v1/notifications/{id})
+  Future<void> deleteNotification(String id) async {
+    _notifications.removeWhere((n) => n.id == id);
+    notifyListeners();
+    try {
+      await _apiClient.delete(ApiConstants.deleteNotification(id));
+    } catch (_) {}
+  }
+
+  // 16. Clear All Notifications (DELETE /api/v1/notifications)
+  Future<void> clearAllNotifications() async {
+    _notifications.clear();
+    notifyListeners();
+    try {
+      await _apiClient.delete(ApiConstants.clearAllNotifications);
     } catch (_) {}
   }
 

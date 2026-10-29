@@ -7,6 +7,7 @@ import '../../services/auth_service.dart';
 import '../../services/delivery_service.dart';
 import '../../widgets/custom_button.dart';
 import '../main_shell_screen.dart';
+import 'phone_verification_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,8 +17,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController =
-      TextEditingController(text: 'kebede@rider.com');
+  final TextEditingController _phoneController =
+      TextEditingController(text: '+251 911 000 001');
   final TextEditingController _passwordController =
       TextEditingController(text: 'RiderPass@123');
 
@@ -27,18 +28,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   void _handleLogin() async {
-    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
+    if (phone.isEmpty || password.isEmpty) {
       setState(() {
-        _errorMessage = 'Please enter your email and password';
+        _errorMessage = 'Please enter your phone number and password';
       });
       return;
     }
@@ -49,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final success = await AuthService().login(email, password);
+      final success = await AuthService().login(phone, password);
       if (success && mounted) {
         // Refresh deliveries and profile with live data
         DeliveryService().refreshAll().catchError((_) {});
@@ -146,21 +147,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  controller: emailCtrl,
-                  keyboardType: TextInputType.emailAddress,
+                  controller: phoneCtrl,
+                  keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
-                    labelText: 'Email Address',
-                    prefixIcon: const Icon(Icons.email_outlined),
+                    labelText: 'Phone Number (Required)',
+                    prefixIcon: const Icon(Icons.phone_outlined),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  controller: phoneCtrl,
-                  keyboardType: TextInputType.phone,
+                  controller: emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    labelText: 'Phone Number',
-                    prefixIcon: const Icon(Icons.phone_outlined),
+                    labelText: 'Email Address (Optional)',
+                    prefixIcon: const Icon(Icons.email_outlined),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
@@ -168,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextField(
                   controller: vehicleCtrl,
                   decoration: InputDecoration(
-                    labelText: 'Vehicle Info (Model & Plate)',
+                    labelText: 'Vehicle Info (Model & Plate - Optional)',
                     prefixIcon: const Icon(Icons.two_wheeler_rounded),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
@@ -178,24 +179,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: passCtrl,
                   obscureText: true,
                   decoration: InputDecoration(
-                    labelText: 'Password',
+                    labelText: 'Password (Required)',
                     prefixIcon: const Icon(Icons.lock_outline_rounded),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
                 const SizedBox(height: 20),
                 CustomButton(
-                  text: 'Submit Application',
+                  text: 'Submit Application & Verify Phone',
                   isLoading: isRegistering,
                   onPressed: isRegistering
                       ? null
                       : () async {
                           if (nameCtrl.text.trim().isEmpty ||
-                              emailCtrl.text.trim().isEmpty ||
                               phoneCtrl.text.trim().isEmpty ||
                               passCtrl.text.trim().isEmpty) {
                             setModalState(() {
-                              modalError = 'Please fill in all required fields.';
+                              modalError = 'Please fill in Full Name, Phone Number, and Password.';
                             });
                             return;
                           }
@@ -208,16 +208,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           try {
                             final res = await AuthService().registerRider(
                               fullName: nameCtrl.text.trim(),
-                              email: emailCtrl.text.trim(),
+                              email: emailCtrl.text.trim().isNotEmpty ? emailCtrl.text.trim() : null,
                               phoneNumber: phoneCtrl.text.trim(),
                               password: passCtrl.text.trim(),
-                              vehicleInfo: vehicleCtrl.text.trim(),
+                              vehicleInfo: vehicleCtrl.text.trim().isNotEmpty ? vehicleCtrl.text.trim() : null,
                             );
                             if (context.mounted) {
                               Navigator.pop(ctx);
-                              _showRegistrationSuccessDialog(
-                                res['message']?.toString() ??
-                                    'Registration submitted! Please wait for admin approval before logging in.',
+                              // Route immediately to PhoneVerificationScreen
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PhoneVerificationScreen(
+                                    phoneNumber: phoneCtrl.text.trim(),
+                                    initialMessage: res['message']?.toString(),
+                                  ),
+                                ),
                               );
                             }
                           } catch (err) {
@@ -522,11 +528,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-              // Email Input
+              // Phone Number Input
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Rider Email',
+                  'Phone Number',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -542,17 +548,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   border: Border.all(color: AppColors.border),
                 ),
                 child: TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                   decoration: const InputDecoration(
-                    hintText: 'e.g. kebede@rider.com',
+                    hintText: 'e.g. +251 911 000 001',
                     hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 14),
-                    prefixIcon: Icon(Icons.email_outlined, color: AppColors.primary, size: 20),
+                    prefixIcon: Icon(Icons.phone_outlined, color: AppColors.primary, size: 20),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),

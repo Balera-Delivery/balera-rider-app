@@ -156,19 +156,21 @@ class _DeliveryHistoryScreenState extends State<DeliveryHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final allDeliveries = _deliveryService.deliveries
-        .where((d) =>
-            d.status == DeliveryStatus.completed ||
-            d.status == DeliveryStatus.cancelled)
-        .toList();
+    final historyList = _deliveryService.historyDeliveries;
 
     List<DeliveryOrder> filteredOrders;
     if (_selectedFilterIndex == 1) {
-      filteredOrders = _deliveryService.completedDeliveries;
+      filteredOrders = historyList
+          .where((d) =>
+              d.status == DeliveryStatus.completed ||
+              d.status == DeliveryStatus.delivered)
+          .toList();
     } else if (_selectedFilterIndex == 2) {
-      filteredOrders = _deliveryService.cancelledDeliveries;
+      filteredOrders = historyList
+          .where((d) => d.status == DeliveryStatus.cancelled)
+          .toList();
     } else {
-      filteredOrders = allDeliveries;
+      filteredOrders = historyList;
     }
 
     return Scaffold(

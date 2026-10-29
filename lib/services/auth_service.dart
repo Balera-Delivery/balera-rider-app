@@ -58,16 +58,19 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<bool> login(String email, String password) async {
+  Future<bool> login(String phoneNumber, String password) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
+      final cleanPhone = phoneNumber.trim();
       final response = await _apiClient.post(
         ApiConstants.riderLogin,
         body: {
-          'email': email.trim(),
+          'phoneNumber': cleanPhone,
+          'identifier': cleanPhone,
+          'email': cleanPhone,
           'password': password.trim(),
         },
       );
@@ -99,9 +102,9 @@ class AuthService extends ChangeNotifier {
 
   Future<Map<String, dynamic>> registerRider({
     required String fullName,
-    required String email,
     required String phoneNumber,
     required String password,
+    String? email,
     String? vehicleInfo,
   }) async {
     _isLoading = true;
@@ -109,15 +112,21 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
 
     try {
+      final payload = <String, dynamic>{
+        'fullName': fullName.trim(),
+        'phoneNumber': phoneNumber.trim(),
+        'password': password.trim(),
+      };
+      if (email != null && email.trim().isNotEmpty) {
+        payload['email'] = email.trim();
+      }
+      if (vehicleInfo != null && vehicleInfo.trim().isNotEmpty) {
+        payload['vehicleInfo'] = vehicleInfo.trim();
+      }
+
       final response = await _apiClient.post(
         ApiConstants.riderRegister,
-        body: {
-          'fullName': fullName.trim(),
-          'email': email.trim(),
-          'phoneNumber': phoneNumber.trim(),
-          'password': password.trim(),
-          'vehicleInfo': vehicleInfo?.trim(),
-        },
+        body: payload,
       );
 
       _isLoading = false;
@@ -131,6 +140,35 @@ class AuthService extends ChangeNotifier {
       _isLoading = false;
       _errorMessage = e.toString();
       notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> sendPhoneOtp(String phoneNumber) async {
+    try {
+      final res = await _apiClient.post(
+        ApiConstants.sendPhoneOtp,
+        body: {'phoneNumber': phoneNumber.trim()},
+      );
+      if (res is Map<String, dynamic>) return res;
+      return {'message': 'Verification OTP sent'};
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyPhoneOtp(String phoneNumber, String code) async {
+    try {
+      final res = await _apiClient.post(
+        ApiConstants.verifyPhoneOtp,
+        body: {
+          'phoneNumber': phoneNumber.trim(),
+          'code': code.trim(),
+        },
+      );
+      if (res is Map<String, dynamic>) return res;
+      return {'message': 'Phone number verified successfully'};
+    } catch (e) {
       rethrow;
     }
   }

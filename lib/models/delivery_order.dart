@@ -106,6 +106,7 @@ class DeliveryOrder {
   final double paymentAmount;
   DeliveryStatus status;
   final String otpCode;
+  final String? qrCodeToken;
   String? completedAt;
   final String date;
   final bool isUpcoming;
@@ -138,6 +139,7 @@ class DeliveryOrder {
     required this.paymentAmount,
     required this.status,
     required this.otpCode,
+    this.qrCodeToken,
     this.completedAt,
     required this.date,
     this.isUpcoming = false,
@@ -162,7 +164,14 @@ class DeliveryOrder {
     final customerName = customer?['fullName']?.toString() ?? 'Balerra Customer';
     final customerPhone = customer?['phoneNumber']?.toString() ?? '+251 911 000 000';
 
-    final pickup = json['pickupLocation']?.toString() ?? 'Pickup Point';
+    final orderObj = json['order'] is Map ? json['order'] as Map<String, dynamic> : null;
+    final restaurant = orderObj?['restaurant'] is Map ? orderObj!['restaurant'] as Map<String, dynamic> : null;
+    final restaurantName = restaurant?['name']?.toString();
+    final restaurantAddress = restaurant?['address']?.toString();
+
+    final pickup = restaurantName != null
+        ? '$restaurantName${restaurantAddress != null && restaurantAddress.isNotEmpty ? ' ($restaurantAddress)' : ''}'
+        : (json['pickupLocation']?.toString() ?? 'Pickup Point');
     final destination = json['destination']?.toString() ?? 'Destination';
     final recName = json['receiverName']?.toString() ?? customerName;
     final recPhone = json['receiverPhone']?.toString() ?? customerPhone;
@@ -177,6 +186,8 @@ class DeliveryOrder {
         json['otp']?['otpCode']?.toString() ??
         json['otp']?['code']?.toString() ??
         '';
+    final qrToken = json['qrCodeToken']?.toString();
+    final fee = (json['riderFee'] as num? ?? json['paymentAmount'] as num?)?.toDouble() ?? 50.0;
 
     return DeliveryOrder(
       id: rawId,
@@ -184,23 +195,24 @@ class DeliveryOrder {
       assignedTime: timeFormatter.format(createdAt),
       pickupLocation: pickup,
       pickupAddressDetails: pickup,
-      pickupPhone: customerPhone,
+      pickupPhone: restaurant?['phone1']?.toString() ?? customerPhone,
       dropoffLocation: destination,
       dropoffAddressDetails: destination,
       dropoffPhone: recPhone,
       eta: '25 min',
       distance: '3.5 km',
-      itemType: json['itemType']?.toString() ?? 'Package',
+      itemType: json['itemType']?.toString() ?? (restaurantName != null ? 'Food & Drinks' : 'Package'),
       itemDescription: json['itemDescription']?.toString() ?? 'Delivery package',
       customerName: customerName,
       customerPhone: customerPhone,
       receiverName: recName,
       receiverPhone: recPhone,
       specialInstructions: json['specialInstructions']?.toString() ?? 'Handle with standard delivery care.',
-      paymentAmount: (json['paymentAmount'] as num?)?.toDouble() ?? 100.0,
+      paymentAmount: fee,
       status: parsedStatus,
       otpCode: extractedOtp,
-      completedAt: json['status'] == 'COMPLETED' ? timeFormatter.format(createdAt) : null,
+      qrCodeToken: qrToken,
+      completedAt: (json['status'] == 'COMPLETED' || json['status'] == 'DELIVERED') ? timeFormatter.format(createdAt) : null,
       date: '${dateFormatter.format(createdAt)} • ${timeFormatter.format(createdAt)}',
       isUpcoming: parsedStatus == DeliveryStatus.assigned,
       pickupLatitude: (json['pickupLatitude'] as num?)?.toDouble(),

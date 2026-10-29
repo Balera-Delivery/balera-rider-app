@@ -222,7 +222,7 @@ class ArrivedLocationScreen extends StatelessWidget {
 
               // Action Buttons
               CustomButton(
-                text: 'Notify Customer & Verify OTP',
+                text: 'Verify Delivery (Scan QR / OTP)',
                 backgroundColor: AppColors.primary,
                 onPressed: () async {
                   try {

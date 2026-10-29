@@ -22,6 +22,8 @@ class ApiConstants {
   // 1. Authentication Endpoints
   static const String riderLogin = '/api/v1/auth/rider/login';
   static const String riderRegister = '/api/v1/auth/rider/register';
+  static const String sendPhoneOtp = '/api/v1/auth/phone/send-otp';
+  static const String verifyPhoneOtp = '/api/v1/auth/phone/verify-otp';
   static const String getMe = '/api/v1/auth/me';
   static const String changePassword = '/api/v1/auth/change-password';
   static const String updateFcmToken = '/api/v1/auth/fcm-token';
@@ -36,6 +38,8 @@ class ApiConstants {
   static String rejectDelivery(String id) => '/api/v1/rider/deliveries/$id/reject';
   static String updateDeliveryStatus(String id) => '/api/v1/rider/deliveries/$id/status';
   static String verifyDeliveryOtp(String id) => '/api/v1/rider/deliveries/$id/verify-otp';
+  static String verifyDeliveryQr(String id) => '/api/v1/rider/deliveries/$id/verify-qr';
+  static const String verifyDeliveryQrGlobal = '/api/v1/rider/verify-qr';
   static const String riderHistory = '/api/v1/rider/history';
   static const String riderProfile = '/api/v1/rider/profile';
   static const String riderNotifications = '/api/v1/rider/notifications';
@@ -43,6 +47,8 @@ class ApiConstants {
   // 3. Notifications Management
   static String markNotificationRead(String id) => '/api/v1/notifications/$id/read';
   static const String markAllNotificationsRead = '/api/v1/notifications/read-all';
+  static String deleteNotification(String id) => '/api/v1/notifications/$id';
+  static const String clearAllNotifications = '/api/v1/notifications';
 
   // 4. Health Check
   static const String healthCheck = '/api/v1/health';
