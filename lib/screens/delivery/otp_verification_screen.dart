@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_styles.dart';
 import '../../models/delivery_order.dart';
@@ -209,29 +210,103 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     );
   }
 
+  String get _targetCustomerPhone {
+    if (widget.order.customerPhone.isNotEmpty && !widget.order.customerPhone.contains('000 000')) {
+      return widget.order.customerPhone;
+    }
+    if (widget.order.receiverPhone.isNotEmpty && !widget.order.receiverPhone.contains('000 000')) {
+      return widget.order.receiverPhone;
+    }
+    if (widget.order.dropoffPhone.isNotEmpty && !widget.order.dropoffPhone.contains('000 000')) {
+      return widget.order.dropoffPhone;
+    }
+    return widget.order.customerPhone.isNotEmpty ? widget.order.customerPhone : widget.order.receiverPhone;
+  }
+
+  Future<void> _callCustomer() async {
+    final phone = _targetCustomerPhone;
+    final cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
+
+    if (cleanPhone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No customer phone registered for this order.')),
+      );
+      return;
+    }
+
+    final uri = Uri.parse('tel:$cleanPhone');
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) await launchUrl(uri);
+    } catch (_) {
+      await Clipboard.setData(ClipboardData(text: cleanPhone));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Phone $cleanPhone copied to clipboard (Dialer unavailable).'),
+            backgroundColor: AppColors.successDark,
+          ),
+        );
+      }
+    }
+  }
+
   void _showSupportDialog() {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Contact Support Desk', style: AppStyles.headingMedium),
+        title: const Text('Contact Support / Customer', style: AppStyles.headingMedium),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'If the customer cannot present the QR code or OTP, contact the Balera dispatch administrator:',
+              'Call the customer to receive the handover QR code or 6-digit OTP code:',
               style: AppStyles.bodyMedium,
             ),
             const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(widget.order.customerName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                      Text(_targetCustomerPhone, style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 12)),
+                    ],
+                  ),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.successDark,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _callCustomer();
+                    },
+                    icon: const Icon(Icons.phone_rounded, size: 14, color: Colors.white),
+                    label: const Text('Call', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Or contact Balera Dispatch Support:',
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 4),
             const Text(
               '📞 Hotline: +251 900 112 233',
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Order Reference: ${widget.order.displayId}',
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
             ),
           ],
         ),
@@ -614,6 +689,21 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            tooltip: 'Call Customer',
+            icon: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.successDark.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.phone_rounded, color: AppColors.successDark, size: 18),
+            ),
+            onPressed: _callCustomer,
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

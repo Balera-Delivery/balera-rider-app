@@ -161,8 +161,13 @@ class DeliveryOrder {
     final dateFormatter = DateFormat('MMM dd, yyyy');
 
     final customer = json['customer'] is Map ? json['customer'] as Map<String, dynamic> : null;
-    final customerName = customer?['fullName']?.toString() ?? 'Balerra Customer';
-    final customerPhone = customer?['phoneNumber']?.toString() ?? '+251 911 000 000';
+    final customerName = customer?['fullName']?.toString() ?? json['customerName']?.toString() ?? 'Balerra Customer';
+    final rawCustPhone = customer?['phoneNumber']?.toString() ?? customer?['phone']?.toString() ?? json['customerPhone']?.toString();
+    final rawRecPhone = json['receiverPhone']?.toString() ?? json['dropoffPhone']?.toString();
+    final effectivePhone = (rawCustPhone != null && rawCustPhone.isNotEmpty)
+        ? rawCustPhone
+        : (rawRecPhone != null && rawRecPhone.isNotEmpty ? rawRecPhone : '+251 911 000 000');
+    final customerPhone = effectivePhone;
 
     final orderObj = json['order'] is Map ? json['order'] as Map<String, dynamic> : null;
     final restaurant = orderObj?['restaurant'] is Map ? orderObj!['restaurant'] as Map<String, dynamic> : null;
@@ -174,7 +179,7 @@ class DeliveryOrder {
         : (json['pickupLocation']?.toString() ?? 'Pickup Point');
     final destination = json['destination']?.toString() ?? 'Destination';
     final recName = json['receiverName']?.toString() ?? customerName;
-    final recPhone = json['receiverPhone']?.toString() ?? customerPhone;
+    final recPhone = (rawRecPhone != null && rawRecPhone.isNotEmpty) ? rawRecPhone : effectivePhone;
 
     final rawStatus = json['status']?.toString() ?? 'ASSIGNED';
     final parsedStatus = DeliveryStatusExtension.fromBackendString(rawStatus);

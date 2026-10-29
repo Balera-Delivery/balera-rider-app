@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_styles.dart';
 import '../../models/delivery_order.dart';
@@ -11,13 +13,50 @@ class ArrivedLocationScreen extends StatelessWidget {
 
   const ArrivedLocationScreen({super.key, required this.order});
 
-  void _showCallingDialog(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Calling customer ${order.receiverName} (${order.dropoffPhone})...'),
-        backgroundColor: AppColors.successDark,
-      ),
-    );
+  String get _targetCustomerPhone {
+    if (order.customerPhone.isNotEmpty && !order.customerPhone.contains('000 000')) {
+      return order.customerPhone;
+    }
+    if (order.receiverPhone.isNotEmpty && !order.receiverPhone.contains('000 000')) {
+      return order.receiverPhone;
+    }
+    if (order.dropoffPhone.isNotEmpty && !order.dropoffPhone.contains('000 000')) {
+      return order.dropoffPhone;
+    }
+    return order.customerPhone.isNotEmpty ? order.customerPhone : order.receiverPhone;
+  }
+
+  Future<void> _callCustomer(BuildContext context) async {
+    final phone = _targetCustomerPhone;
+    final cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
+
+    if (cleanPhone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No registered customer phone number found for this order.'),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+      return;
+    }
+
+    final uri = Uri.parse('tel:$cleanPhone');
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        await launchUrl(uri);
+      }
+    } catch (_) {
+      await Clipboard.setData(ClipboardData(text: cleanPhone));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Phone $cleanPhone copied to clipboard (Dialer unavailable).'),
+            backgroundColor: AppColors.successDark,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -181,7 +220,7 @@ class ArrivedLocationScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Customer',
+                                'Recipient / Customer',
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,
@@ -193,24 +232,55 @@ class ArrivedLocationScreen extends StatelessWidget {
                                 order.customerName,
                                 style: const TextStyle(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                _targetCustomerPhone,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
+                                  letterSpacing: 0.3,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        IconButton(
-                          icon: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: const BoxDecoration(
-                              color: AppColors.primaryLight,
-                              shape: BoxShape.circle,
+                        InkWell(
+                          onTap: () => _callCustomer(context),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: AppColors.successDark,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.successDark.withValues(alpha: 0.25),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
-                            child: const Icon(Icons.phone_rounded,
-                                color: AppColors.primary, size: 18),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.phone_rounded, color: Colors.white, size: 16),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Call',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          onPressed: () => _showCallingDialog(context),
                         ),
                       ],
                     ),

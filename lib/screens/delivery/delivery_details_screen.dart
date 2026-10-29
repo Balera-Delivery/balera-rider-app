@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_styles.dart';
 import '../../models/delivery_order.dart';
@@ -14,6 +16,48 @@ class DeliveryDetailsScreen extends StatelessWidget {
   final DeliveryOrder order;
 
   const DeliveryDetailsScreen({super.key, required this.order});
+
+  static Future<void> makePhoneCall(BuildContext context, String phone) async {
+    final cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
+    if (cleanPhone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No valid phone number to call.')),
+      );
+      return;
+    }
+    final uri = Uri.parse('tel:$cleanPhone');
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) await launchUrl(uri);
+    } catch (_) {
+      await Clipboard.setData(ClipboardData(text: cleanPhone));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Phone $cleanPhone copied to clipboard (Dialer unavailable).'),
+            backgroundColor: AppColors.successDark,
+          ),
+        );
+      }
+    }
+  }
+
+  static Future<void> sendSms(BuildContext context, String phone) async {
+    final cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
+    if (cleanPhone.isEmpty) return;
+    final uri = Uri.parse('sms:$cleanPhone');
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) await launchUrl(uri);
+    } catch (_) {
+      await Clipboard.setData(ClipboardData(text: cleanPhone));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Phone $cleanPhone copied to clipboard.')),
+        );
+      }
+    }
+  }
 
   void _showCallOptions(BuildContext context, String name, String phone) {
     showModalBottomSheet(
@@ -40,12 +84,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
                     backgroundColor: AppColors.successDark,
                     onPressed: () {
                       Navigator.pop(ctx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Calling $name ($phone)...'),
-                          backgroundColor: AppColors.successDark,
-                        ),
-                      );
+                      makePhoneCall(context, phone);
                     },
                   ),
                 ),
@@ -57,12 +96,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
                     backgroundColor: AppColors.primary,
                     onPressed: () {
                       Navigator.pop(ctx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Opening SMS to $phone...'),
-                          backgroundColor: AppColors.primary,
-                        ),
-                      );
+                      sendSms(context, phone);
                     },
                   ),
                 ),
