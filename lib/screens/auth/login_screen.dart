@@ -7,6 +7,7 @@ import '../../services/auth_service.dart';
 import '../../services/delivery_service.dart';
 import '../../widgets/custom_button.dart';
 import '../main_shell_screen.dart';
+import 'forgot_password_screen.dart';
 import 'phone_verification_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -638,35 +639,68 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
 
-              // Demo credentials helper
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _phoneController.text = '+251 911 000 001';
-                      _passwordController.text = 'RiderPass@123';
-                    });
-                  },
-                  icon: const Icon(Icons.auto_fix_high_rounded, size: 14, color: AppColors.primary),
-                  label: const Text(
-                    'Fill Demo Rider (+251 911 000 001)',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+              // Forgot Password & Demo Helper
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      final resetPhone = await Navigator.push<String>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ForgotPasswordScreen(
+                            initialPhone: _phoneController.text.trim(),
+                          ),
+                        ),
+                      );
+                      if (resetPhone != null && resetPhone.isNotEmpty && mounted) {
+                        setState(() {
+                          _phoneController.text = resetPhone;
+                          _passwordController.clear();
+                        });
+                      }
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _phoneController.text = '+251 911 000 001';
+                        _passwordController.text = 'RiderPass@123';
+                      });
+                    },
+                    icon: const Icon(Icons.auto_fix_high_rounded, size: 14, color: AppColors.primary),
+                    label: const Text(
+                      'Fill Demo Rider',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
 
               // Login Button
               CustomButton(

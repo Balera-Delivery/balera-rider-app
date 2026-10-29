@@ -24,6 +24,7 @@ class ApiConstants {
   static const String riderRegister = '/api/v1/auth/rider/register';
   static const String sendPhoneOtp = '/api/v1/auth/phone/send-otp';
   static const String verifyPhoneOtp = '/api/v1/auth/phone/verify-otp';
+  static const String resetPasswordPhone = '/api/v1/auth/phone/reset-password';
   static const String getMe = '/api/v1/auth/me';
   static const String changePassword = '/api/v1/auth/change-password';
   static const String updateFcmToken = '/api/v1/auth/fcm-token';

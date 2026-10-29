@@ -173,6 +173,27 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> resetPasswordWithOtp({
+    required String phoneNumber,
+    required String code,
+    required String newPassword,
+  }) async {
+    try {
+      final res = await _apiClient.post(
+        ApiConstants.resetPasswordPhone,
+        body: {
+          'phoneNumber': phoneNumber.trim(),
+          'code': code.trim(),
+          'newPassword': newPassword.trim(),
+        },
+      );
+      if (res is Map<String, dynamic>) return res;
+      return {'message': 'Password reset successfully'};
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> changePassword(String currentPassword, String newPassword) async {
     try {
       await _apiClient.put(
