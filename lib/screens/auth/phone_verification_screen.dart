@@ -9,11 +9,13 @@ import '../../widgets/custom_button.dart';
 class PhoneVerificationScreen extends StatefulWidget {
   final String phoneNumber;
   final String? initialMessage;
+  final String? devOtp;
 
   const PhoneVerificationScreen({
     super.key,
     required this.phoneNumber,
     this.initialMessage,
+    this.devOtp,
   });
 
   @override
@@ -29,6 +31,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
   bool _isResending = false;
   String? _errorMessage;
   String? _successMessage;
+  String? _activeDevOtp;
 
   int _resendCountdown = 60;
   Timer? _countdownTimer;
@@ -36,6 +39,13 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
   @override
   void initState() {
     super.initState();
+    _activeDevOtp = widget.devOtp;
+    if (_activeDevOtp != null && _activeDevOtp!.length == 6) {
+      final digits = _activeDevOtp!.split('');
+      for (int i = 0; i < 6; i++) {
+        _controllers[i].text = digits[i];
+      }
+    }
     _startCountdown();
   }
 
@@ -136,11 +146,18 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     });
 
     try {
-      await AuthService().sendPhoneOtp(widget.phoneNumber);
+      final res = await AuthService().sendPhoneOtp(widget.phoneNumber);
       if (mounted) {
         setState(() {
           _isResending = false;
           _startCountdown();
+          if (res['devOtp'] != null) {
+            _activeDevOtp = res['devOtp'].toString();
+            final digits = _activeDevOtp!.split('');
+            for (int i = 0; i < 6 && i < digits.length; i++) {
+              _controllers[i].text = digits[i];
+            }
+          }
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -275,6 +292,34 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                     _errorMessage!,
                     style: const TextStyle(color: AppColors.danger, fontSize: 13),
                     textAlign: TextAlign.center,
+                  ),
+                ),
+
+              if (_activeDevOtp != null)
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0FDF4),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFF86EFAC)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info_outline_rounded, color: AppColors.success, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Test Mode: Verification OTP is $_activeDevOtp',
+                          style: const TextStyle(
+                            color: Color(0xFF166534),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 

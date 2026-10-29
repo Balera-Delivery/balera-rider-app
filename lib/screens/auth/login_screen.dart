@@ -222,6 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   builder: (_) => PhoneVerificationScreen(
                                     phoneNumber: phoneCtrl.text.trim(),
                                     initialMessage: res['message']?.toString(),
+                                    devOtp: res['devOtp']?.toString(),
                                   ),
                                 ),
                               );
