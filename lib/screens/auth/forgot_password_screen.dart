@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../constants/app_colors.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/password_input_field.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   final String? initialPhone;
@@ -26,8 +27,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   int _step = 1; // 1 = Enter Phone, 2 = Verify OTP & Set New Password
   bool _isLoading = false;
   bool _isResending = false;
-  bool _obscureNewPass = true;
-  bool _obscureConfirmPass = true;
   String? _errorMessage;
   String? _devOtp;
 
@@ -498,35 +497,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                 ),
                 const SizedBox(height: 6),
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: TextField(
-                    controller: _newPasswordController,
-                    obscureText: _obscureNewPass,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    cursorColor: AppColors.primary,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-                    decoration: InputDecoration(
-                      hintText: 'Enter new password (min. 6 chars)',
-                      hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
-                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primary, size: 20),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureNewPass ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                          color: AppColors.textSecondary,
-                          size: 20,
-                        ),
-                        onPressed: () => setState(() => _obscureNewPass = !_obscureNewPass),
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    ),
-                  ),
+                PasswordInputField(
+                  controller: _newPasswordController,
+                  hintText: 'Enter new password (min. 6 chars)',
                 ),
                 const SizedBox(height: 14),
 
@@ -536,35 +509,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                 ),
                 const SizedBox(height: 6),
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: TextField(
-                    controller: _confirmPasswordController,
-                    obscureText: _obscureConfirmPass,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    cursorColor: AppColors.primary,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-                    decoration: InputDecoration(
-                      hintText: 'Re-enter your new password',
-                      hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
-                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primary, size: 20),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureConfirmPass ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                          color: AppColors.textSecondary,
-                          size: 20,
-                        ),
-                        onPressed: () => setState(() => _obscureConfirmPass = !_obscureConfirmPass),
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    ),
-                  ),
+                PasswordInputField(
+                  controller: _confirmPasswordController,
+                  hintText: 'Re-enter your new password',
                 ),
                 const SizedBox(height: 28),
 

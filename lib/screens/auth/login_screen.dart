@@ -6,6 +6,7 @@ import '../../services/api_client.dart';
 import '../../services/auth_service.dart';
 import '../../services/delivery_service.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/password_input_field.dart';
 import '../main_shell_screen.dart';
 import 'forgot_password_screen.dart';
 import 'phone_verification_screen.dart';
@@ -21,7 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  bool _obscurePassword = true;
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -175,34 +175,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                TextField(
+                PasswordInputField(
                   controller: passCtrl,
-                  obscureText: obscureRegisterPass,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  cursorColor: AppColors.primary,
-                  textInputAction: TextInputAction.done,
-                  decoration: InputDecoration(
-                    labelText: 'Password (Required)',
-                    hintText: 'Enter a secure password',
-                    prefixIcon: const Icon(Icons.lock_outline_rounded),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        obscureRegisterPass
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                        color: AppColors.textSecondary,
-                        size: 20,
-                      ),
-                      onPressed: () {
-                        setModalState(() {
-                          obscureRegisterPass = !obscureRegisterPass;
-                        });
-                      },
-                      tooltip: obscureRegisterPass ? 'Show password' : 'Hide password',
-                    ),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
+                  labelText: 'Password (Required)',
+                  hintText: 'Enter a secure password',
+                  isOutlined: true,
                 ),
                 const SizedBox(height: 20),
                 CustomButton(
@@ -600,44 +577,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 6),
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: TextField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  cursorColor: AppColors.primary,
-                  textInputAction: TextInputAction.done,
-                  onSubmitted: (_) => _handleLogin(),
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'Enter your password',
-                    hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
-                    prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primary, size: 20),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                        color: AppColors.textSecondary,
-                        size: 20,
-                      ),
-                      onPressed: () {
-                        setState(() => _obscurePassword = !_obscurePassword);
-                      },
-                      tooltip: _obscurePassword ? 'Show password' : 'Hide password',
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  ),
-                ),
+              PasswordInputField(
+                controller: _passwordController,
+                hintText: 'Enter your password',
+                onSubmitted: (_) => _handleLogin(),
               ),
               const SizedBox(height: 14),
 
@@ -679,8 +622,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextButton.icon(
                     onPressed: () {
                       setState(() {
-                        _phoneController.text = '+251 911 000 001';
-                        _passwordController.text = 'RiderPass@123';
+                        _phoneController.value = const TextEditingValue(
+                          text: '+251 911 000 001',
+                          selection: TextSelection.collapsed(offset: 16),
+                        );
+                        _passwordController.value = const TextEditingValue(
+                          text: 'RiderPass@123',
+                          selection: TextSelection.collapsed(offset: 12),
+                        );
                       });
                     },
                     icon: const Icon(Icons.auto_fix_high_rounded, size: 14, color: AppColors.primary),
