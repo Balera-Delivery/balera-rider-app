@@ -23,9 +23,12 @@ class RiderDashboardScreen extends StatefulWidget {
   State<RiderDashboardScreen> createState() => _RiderDashboardScreenState();
 }
 
-class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
+class _RiderDashboardScreenState extends State<RiderDashboardScreen>
+    with SingleTickerProviderStateMixin {
   final DeliveryService _deliveryService = DeliveryService();
   late final PageController _pageController;
+  late final AnimationController _radarController;
+  late final Animation<double> _radarAnimation;
   Timer? _gpsTimer;
   Timer? _syncTimer;
   bool _isAccepting = false;
@@ -36,6 +39,16 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
+
+    // Radar pulse animation for online idle state
+    _radarController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    )..repeat();
+    _radarAnimation = Tween<double>(begin: 0.2, end: 1.0).animate(
+      CurvedAnimation(parent: _radarController, curve: Curves.easeOut),
+    );
+
     _deliveryService.addListener(_onServiceUpdate);
     _deliveryService.refreshAll().catchError((_) {});
     _startGpsHeartbeat();
@@ -64,6 +77,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
 
   @override
   void dispose() {
+    _radarController.dispose();
     _pageController.dispose();
     _gpsTimer?.cancel();
     _syncTimer?.cancel();
@@ -252,8 +266,8 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                     setState(() => _selectedPageIndex = idx);
                   },
                   children: [
-                    // PAGE 0: ACTIVE MISSION LIVE MAP WITH DRAGGABLE/SCROLLABLE BOTTOM SHEET
-                    _buildActiveTaskPage(displayOrders),
+                    // PAGE 0: ACTIVE MISSION (LIVE MAP + DYNAMIC IDLE RADAR OR BOOKING SHEET)
+                    _buildActiveTaskPage(displayOrders, profile),
 
                     // PAGE 1: SHIFT & EARNINGS
                     _buildShiftAndEarningsPage(profile),
@@ -582,110 +596,264 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // 3. PAGE 0: ACTIVE MISSION (LIVE MAP + VERTICALLY SCROLLABLE SHEET)
+  // 3. PAGE 0: ACTIVE MISSION (DYNAMIC: RADAR WHEN IDLE, BOOKING SHEET WHEN ACTIVE)
   // ---------------------------------------------------------------------------
-  Widget _buildActiveTaskPage(List<DeliveryOrder> displayOrders) {
+  Widget _buildActiveTaskPage(List<DeliveryOrder> displayOrders, dynamic profile) {
+    // -------------------------------------------------------------------------
+    // A. NO ACTIVE DELIVERY (IDLE STATE): RADAR / SEARCHING / STANDBY MODE
+    // -------------------------------------------------------------------------
     if (displayOrders.isEmpty) {
+      final isOnline = profile.isOnline;
+
       return Stack(
+        alignment: Alignment.center,
         children: [
           // Background Live Map
           const Positioned.fill(
             child: RouteMapWidget(isInteractive: true),
           ),
-          // Clean bottom sheet overlay
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+
+          // If Offline: Soft Dimmed Overlay
+          if (!isOnline)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withValues(alpha: 0.28),
+              ),
+            ),
+
+          // Center Animated Radar Pulse (When Online & Searching)
+          if (isOnline) ...[
+            AnimatedBuilder(
+              animation: _radarAnimation,
+              builder: (context, child) {
+                final size = 180.0 * _radarAnimation.value;
+                return Container(
+                  width: size,
+                  height: size,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.primary.withValues(alpha: 0.18 * (1.0 - _radarAnimation.value)),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.55 * (1.0 - _radarAnimation.value)),
+                      width: 2,
+                    ),
+                  ),
+                );
+              },
+            ),
+            // Center Bike Marker
+            Container(
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 3),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.14),
-                    blurRadius: 16,
-                    offset: const Offset(0, -4),
+                    color: AppColors.primary.withValues(alpha: 0.45),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 26),
+            ),
+          ] else ...[
+            // Center Standby Icon (When Offline)
+            Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                color: const Color(0xFF475569),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 3),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4)),
+                ],
+              ),
+              child: const Icon(Icons.power_settings_new_rounded, color: Colors.white, size: 28),
+            ),
+          ],
+
+          // Top Floating Radar Pill Tag over Map
+          Positioned(
+            top: 14,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.94),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.10),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: isOnline ? const Color(0xFF10B981) : const Color(0xFFF43F5E),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    isOnline ? '📍 GPS Active • Bale Robe Zone' : '📍 GPS Standby (Offline)',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Bottom Floating Status Card (Clean, modern, informative)
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: AppColors.border),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.16),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFCBD5E1),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
+                  // Status Header Pill
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
-                          borderRadius: BorderRadius.circular(14),
+                          color: isOnline ? const Color(0xFFDCFCE7) : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.two_wheeler_rounded, color: AppColors.primary, size: 28),
-                      ),
-                      const SizedBox(width: 14),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              'Ready for Deliveries',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
+                            Container(
+                              width: 7,
+                              height: 7,
+                              decoration: BoxDecoration(
+                                color: isOnline ? const Color(0xFF16A34A) : const Color(0xFF64748B),
+                                shape: BoxShape.circle,
                               ),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(width: 6),
                             Text(
-                              'Stay online. New orders will appear live on this map.',
-                              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                              isOnline ? "YOU'RE ONLINE" : "YOU'RE OFFLINE",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                color: isOnline ? const Color(0xFF15803D) : const Color(0xFF475569),
+                                letterSpacing: 0.3,
+                              ),
                             ),
                           ],
                         ),
                       ),
+                      const Spacer(),
+                      // Today Quick Snapshot
+                      Text(
+                        'Today: ETB ${profile.todayEarnings.toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
                     ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Headline
+                  Text(
+                    isOnline ? 'Searching for nearby requests...' : 'Shift is Currently Paused',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF0F172A),
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+
+                  // Subtitle
+                  Text(
+                    isOnline
+                        ? 'Stay in high-demand zones around Robe central market to receive incoming orders faster.'
+                        : 'Switch online whenever you are ready to receive delivery assignments and earn in Bale.',
+                    style: const TextStyle(fontSize: 12.5, color: Color(0xFF64748B), height: 1.35),
                   ),
                   const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          icon: const Icon(Icons.inventory_2_outlined, size: 16),
-                          label: const Text('Assigned Queue'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.primary,
-                            side: const BorderSide(color: AppColors.primary),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+
+                  // Action Button(s)
+                  if (isOnline) ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFFCBD5E1)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              padding: const EdgeInsets.symmetric(vertical: 13),
+                            ),
+                            onPressed: () async {
+                              await _deliveryService.toggleOnlineStatus(false);
+                            },
+                            child: const Text(
+                              'Pause Shift',
+                              style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w700, fontSize: 13.5),
+                            ),
                           ),
-                          onPressed: () => widget.onNavigateTab?.call(1),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.arrow_forward_rounded, size: 16, color: Colors.white),
-                          label: const Text('Shift Stats', style: TextStyle(color: Colors.white)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.bar_chart_rounded, size: 16, color: Colors.white),
+                            label: const Text('Shift Stats', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13.5)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              padding: const EdgeInsets.symmetric(vertical: 13),
+                            ),
+                            onPressed: () => _switchPage(1),
                           ),
-                          onPressed: () => _switchPage(1),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ] else ...[
+                    CustomButton(
+                      text: 'GO ONLINE TO RECEIVE ORDERS',
+                      icon: Icons.power_settings_new_rounded,
+                      backgroundColor: const Color(0xFF10B981),
+                      height: 48,
+                      onPressed: () async {
+                        await _deliveryService.toggleOnlineStatus(true);
+                      },
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -694,6 +862,9 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
       );
     }
 
+    // -------------------------------------------------------------------------
+    // B. ACTIVE DELIVERY IN PROGRESS: LIVE ROUTE MAP + VERTICAL BOTTOM SHEET
+    // -------------------------------------------------------------------------
     final currentOrder = displayOrders[_currentOrderIndex];
 
     return Stack(
@@ -708,7 +879,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
           ),
         ),
 
-        // 2. Vertically Draggable / Scrollable Bottom Sheet (Exact design from user screenshot!)
+        // 2. Vertically Draggable / Scrollable Bottom Sheet
         DraggableScrollableSheet(
           initialChildSize: 0.58,
           minChildSize: 0.35,
@@ -745,7 +916,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                   ),
                   const SizedBox(height: 14),
 
-                  // If multiple orders, show switcher bar
+                  // Multi-Order Switcher Bar (If multiple active orders exist)
                   if (displayOrders.length > 1) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -797,11 +968,11 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                     const SizedBox(height: 12),
                   ],
 
-                  // 1. Customer Profile Row with circular Phone & SMS buttons (Matching Screenshot)
+                  // 1. Customer Profile Row with circular Phone & SMS buttons
                   _buildCustomerProfileRow(currentOrder),
                   const SizedBox(height: 12),
 
-                  // 2. Status Banner Strip (Matching Screenshot)
+                  // 2. Status Banner Strip
                   _buildStatusPillBanner(currentOrder),
                   const SizedBox(height: 14),
 
