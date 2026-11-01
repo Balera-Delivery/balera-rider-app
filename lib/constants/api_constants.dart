@@ -35,6 +35,7 @@ class ApiConstants {
   static const String riderLocation = '/api/v1/rider/location';
   static const String assignedDeliveries = '/api/v1/rider/assigned';
   static const String activeDelivery = '/api/v1/rider/active';
+  static String deliveryDetails(String id) => '/api/v1/rider/deliveries/$id';
   static String acceptDelivery(String id) => '/api/v1/rider/deliveries/$id/accept';
   static String rejectDelivery(String id) => '/api/v1/rider/deliveries/$id/reject';
   static String updateDeliveryStatus(String id) => '/api/v1/rider/deliveries/$id/status';

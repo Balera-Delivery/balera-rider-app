@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -7,16 +8,54 @@ import '../../models/delivery_order.dart';
 import '../../services/delivery_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/route_map_painter.dart';
-import '../../widgets/status_badge.dart';
 import 'navigation_screen.dart';
 import 'otp_verification_screen.dart';
 import 'pickup_confirmation_screen.dart';
 import 'on_the_way_screen.dart';
 
-class DeliveryDetailsScreen extends StatelessWidget {
+class DeliveryDetailsScreen extends StatefulWidget {
   final DeliveryOrder order;
 
   const DeliveryDetailsScreen({super.key, required this.order});
+
+  @override
+  State<DeliveryDetailsScreen> createState() => _DeliveryDetailsScreenState();
+}
+
+class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
+  late DeliveryOrder _order;
+  DeliveryOrder get order => _order;
+  Timer? _syncTimer;
+  final DeliveryService _deliveryService = DeliveryService();
+
+  @override
+  void initState() {
+    super.initState();
+    _order = widget.order;
+    _deliveryService.addListener(_onServiceUpdate);
+    _syncTimer = Timer.periodic(const Duration(seconds: 5), (_) => _syncOrder());
+  }
+
+  @override
+  void dispose() {
+    _syncTimer?.cancel();
+    _deliveryService.removeListener(_onServiceUpdate);
+    super.dispose();
+  }
+
+  void _onServiceUpdate() {
+    final active = _deliveryService.currentDelivery;
+    if (active != null && active.id == _order.id && mounted) {
+      setState(() => _order = active);
+    }
+  }
+
+  Future<void> _syncOrder() async {
+    final fresh = await _deliveryService.fetchDeliveryDetails(_order.id);
+    if (fresh != null && mounted) {
+      setState(() => _order = fresh);
+    }
+  }
 
   static Future<void> makePhoneCall(BuildContext context, String phone) async {
     final cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
@@ -61,6 +100,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
   }
 
   void _showItemDetails(BuildContext context) {
+    final order = _order;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -91,6 +131,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final order = _order;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -817,6 +858,26 @@ class DeliveryDetailsScreen extends StatelessWidget {
             ),
           ),
         ],
+      );
+    } else if (order.status == DeliveryStatus.completed) {
+      return CustomButton(
+        text: 'Delivery Completed (Support Verified)',
+        icon: Icons.check_circle_rounded,
+        backgroundColor: AppColors.success,
+        height: 50,
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      );
+    } else if (order.status == DeliveryStatus.cancelled) {
+      return CustomButton(
+        text: 'Delivery Cancelled by Support',
+        icon: Icons.cancel_rounded,
+        backgroundColor: AppColors.danger,
+        height: 50,
+        onPressed: () {
+          Navigator.pop(context);
+        },
       );
     } else if (order.status == DeliveryStatus.delivered ||
         order.status == DeliveryStatus.arrivedAtLocation) {

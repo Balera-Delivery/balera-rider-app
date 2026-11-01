@@ -425,6 +425,25 @@ class DeliveryService extends ChangeNotifier {
     } catch (_) {}
   }
 
+  Future<DeliveryOrder?> fetchDeliveryDetails(String id) async {
+    try {
+      final data = await _apiClient.get(ApiConstants.deliveryDetails(id));
+      if (data is Map<String, dynamic>) {
+        final order = DeliveryOrder.fromJson(data);
+        final index = _deliveries.indexWhere((d) => d.id == id);
+        if (index != -1) {
+          _deliveries[index] = order;
+        }
+        if (_currentActiveDelivery?.id == id) {
+          _currentActiveDelivery = order;
+        }
+        notifyListeners();
+        return order;
+      }
+    } catch (_) {}
+    return null;
+  }
+
   DeliveryOrder? getDeliveryById(String id) {
     try {
       return _deliveries.firstWhere((d) => d.id == id);

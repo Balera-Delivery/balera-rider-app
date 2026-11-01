@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -37,6 +38,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   bool _isLoading = false;
   bool _isProcessingScan = false;
   String? _errorMessage;
+  Timer? _statusCheckTimer;
 
   @override
   void initState() {
@@ -52,10 +54,61 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     for (int i = 0; i < 6 && i < digits.length; i++) {
       _otpControllers[i].text = digits[i];
     }
+
+    _startStatusPolling();
+  }
+
+  void _startStatusPolling() {
+    // Check every 4 seconds for administrative override or customer OTP update
+    _statusCheckTimer = Timer.periodic(const Duration(seconds: 4), (_) async {
+      await _checkAdminOrSupportStatus();
+    });
+  }
+
+  Future<void> _checkAdminOrSupportStatus({bool isManual = false}) async {
+    if (!mounted || _isLoading) return;
+    try {
+      final updatedOrder = await _deliveryService.fetchDeliveryDetails(widget.order.id);
+      if (updatedOrder != null && mounted) {
+        if (updatedOrder.status == DeliveryStatus.completed) {
+          _statusCheckTimer?.cancel();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✓ Delivery verified and completed by Bale Support!'),
+              backgroundColor: AppColors.success,
+              duration: Duration(seconds: 3),
+            ),
+          );
+          _navigateToCompleted(updatedOrder);
+          return;
+        } else if (updatedOrder.status == DeliveryStatus.cancelled) {
+          _statusCheckTimer?.cancel();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Order was cancelled by Bale Support/Admin.'),
+              backgroundColor: AppColors.danger,
+              duration: Duration(seconds: 3),
+            ),
+          );
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          return;
+        }
+
+        if (isManual && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Status checked: ${updatedOrder.status.displayName}'),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (_) {}
   }
 
   @override
   void dispose() {
+    _statusCheckTimer?.cancel();
     _scannerController?.dispose();
     _manualQrController.dispose();
     for (var c in _otpControllers) {
@@ -151,11 +204,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     }
   }
 
-  void _navigateToCompleted() {
+  void _navigateToCompleted([DeliveryOrder? resolvedOrder]) {
+    _statusCheckTimer?.cancel();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => DeliveryCompletedScreen(order: widget.order),
+        builder: (_) => DeliveryCompletedScreen(order: resolvedOrder ?? widget.order),
       ),
     );
   }
@@ -305,15 +359,32 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             ),
             const SizedBox(height: 4),
             const Text(
-              '📞 Hotline: +251 900 112 233',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+              '📞 Hotline: +251 911 000 000',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.textPrimary),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Support can give you the OTP or complete the order directly if customer cannot be reached.',
+              style: TextStyle(fontSize: 11, color: AppColors.textMuted),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close', style: TextStyle(color: AppColors.primary)),
+            child: const Text('Close', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            icon: const Icon(Icons.sync_rounded, size: 16, color: Colors.white),
+            label: const Text('Check Support Status', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await _checkAdminOrSupportStatus(isManual: true);
+            },
           ),
         ],
       ),
@@ -742,17 +813,43 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
               const SizedBox(height: 24),
 
-              // Can't verify link
-              GestureDetector(
-                onTap: _showSupportDialog,
-                child: const Text(
-                  "Can't verify? Contact Support",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+              // Help & Support actions
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: _showSupportDialog,
+                    child: const Text(
+                      "Can't verify? Contact Support",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  const Text('•', style: TextStyle(color: AppColors.textMuted)),
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: () => _checkAdminOrSupportStatus(isManual: true),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.sync_rounded, size: 14, color: AppColors.primary),
+                        SizedBox(width: 4),
+                        Text(
+                          "Check Status",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
             ],
