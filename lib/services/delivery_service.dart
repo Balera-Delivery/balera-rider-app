@@ -168,9 +168,11 @@ class DeliveryService extends ChangeNotifier {
   }
 
   // 5. Fetch Assigned Deliveries (GET /api/v1/rider/assigned)
-  Future<void> fetchAssignedDeliveries() async {
-    _isLoadingDeliveries = true;
-    notifyListeners();
+  Future<void> fetchAssignedDeliveries({bool silent = false}) async {
+    if (!silent) {
+      _isLoadingDeliveries = true;
+      notifyListeners();
+    }
 
     try {
       final data = await _apiClient.get(ApiConstants.assignedDeliveries);

@@ -51,11 +51,10 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
   }
 
   void _startPeriodicSync() {
-    _syncTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+    _syncTimer = Timer.periodic(const Duration(seconds: 8), (_) {
       if (mounted && _deliveryService.riderProfile.isOnline) {
-        _deliveryService.fetchAssignedDeliveries().catchError((_) {});
+        _deliveryService.fetchAssignedDeliveries(silent: true).catchError((_) {});
         _deliveryService.fetchActiveDelivery().catchError((_) {});
-        _deliveryService.fetchProfile().catchError((_) {});
       }
     });
   }
