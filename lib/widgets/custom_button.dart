@@ -42,9 +42,21 @@ class CustomButton extends StatelessWidget {
     final effectiveBorderColor =
         borderColor ?? (isOutlined ? (textColor ?? AppColors.primary) : Colors.transparent);
 
-    return SizedBox(
+    return Container(
       width: width,
       height: height,
+      decoration: isOutlined
+          ? null
+          : BoxDecoration(
+              borderRadius: effectiveBorderRadius,
+              boxShadow: [
+                BoxShadow(
+                  color: (backgroundColor ?? AppColors.primary).withValues(alpha: 0.35),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(

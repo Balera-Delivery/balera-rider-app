@@ -145,10 +145,10 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: _focusNode.hasFocus ? AppColors.primary : AppColors.border,
+          color: _focusNode.hasFocus ? AppColors.neonCyan : AppColors.border,
           width: _focusNode.hasFocus ? 1.5 : 1.0,
         ),
       ),
@@ -161,7 +161,7 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
         enableInteractiveSelection: true,
         enableSuggestions: false,
         autocorrect: false,
-        cursorColor: AppColors.primary,
+        cursorColor: AppColors.neonCyan,
         cursorWidth: 2.0,
         textInputAction: TextInputAction.done,
         onSubmitted: widget.onSubmitted,
@@ -183,7 +183,7 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
         decoration: InputDecoration(
           hintText: widget.hintText,
           hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
-          prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primary, size: 20),
+          prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.neonCyan, size: 20),
           suffixIcon: suffixActions,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

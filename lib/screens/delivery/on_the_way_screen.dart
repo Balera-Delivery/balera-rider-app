@@ -47,14 +47,14 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: AppColors.textPrimary, size: 20),
+              color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -62,7 +62,7 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
@@ -95,7 +95,7 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 6),
@@ -114,7 +114,7 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: AppStyles.radiusLarge,
                   border: Border.all(color: AppColors.border),
                   boxShadow: AppStyles.cardShadow,
@@ -126,26 +126,26 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          widget.order.id,
+                          widget.order.displayId,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
+                            color: Colors.white,
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEFF6FF),
+                            color: AppColors.neonCyan.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFBFDBFE)),
+                            border: Border.all(color: AppColors.neonCyan.withValues(alpha: 0.4)),
                           ),
                           child: const Text(
                             'En Route',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.primary,
+                              color: AppColors.neonCyan,
                             ),
                           ),
                         ),
@@ -163,7 +163,7 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.check,
-                              color: AppColors.successDark, size: 16),
+                              color: AppColors.success, size: 16),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -183,7 +183,7 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
+                                  color: Colors.white,
                                 ),
                               ),
                             ],
@@ -196,7 +196,7 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                       child: Container(
                         width: 2,
                         height: 24,
-                        color: const Color(0xFFCBD5E1),
+                        color: AppColors.border,
                       ),
                     ),
 
@@ -205,12 +205,12 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(6),
-                          decoration: const BoxDecoration(
-                            color: AppColors.primaryLight,
+                          decoration: BoxDecoration(
+                            color: AppColors.neonCyan.withValues(alpha: 0.18),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.location_on_rounded,
-                              color: AppColors.primary, size: 16),
+                              color: AppColors.neonCyan, size: 16),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -230,7 +230,7 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
+                                  color: Colors.white,
                                 ),
                               ),
                             ],

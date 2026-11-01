@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -505,7 +505,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
@@ -518,20 +518,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: TextButton.icon(
                   onPressed: _showServerConfigDialog,
                   icon: const Icon(Icons.dns_outlined,
-                      size: 15, color: AppColors.primary),
+                      size: 15, color: AppColors.neonCyan),
                   label: Text(
                     ApiConstants.activeBaseUrl.replaceAll('http://', ''),
                     style: const TextStyle(
                         fontSize: 12,
-                        color: AppColors.primary,
+                        color: AppColors.neonCyan,
                         fontWeight: FontWeight.w600),
                   ),
                   style: TextButton.styleFrom(
-                    backgroundColor: AppColors.primaryLight,
+                    backgroundColor: AppColors.surface,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 6),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                        side: const BorderSide(color: AppColors.border)),
                   ),
                 ),
               ),
@@ -543,11 +544,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 100,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
+                  color: AppColors.surface,
+                  border: Border.all(color: AppColors.border, width: 2),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.12),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
+                      color: AppColors.primary.withValues(alpha: 0.35),
+                      blurRadius: 24,
+                      spreadRadius: 2,
                     ),
                   ],
                 ),
@@ -556,11 +559,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     'assets/images/logo.png',
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) => Container(
-                      color: AppColors.primaryLight,
+                      color: AppColors.surface,
                       child: const Icon(
                         Icons.delivery_dining_rounded,
                         size: 50,
-                        color: AppColors.primary,
+                        color: AppColors.neonCyan,
                       ),
                     ),
                   ),
@@ -574,7 +577,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 4),
@@ -608,7 +611,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text(
                           _errorMessage!,
                           style: const TextStyle(
-                            color: AppColors.danger,
+                            color: Colors.white,
                             fontSize: 13.5,
                             fontWeight: FontWeight.w500,
                           ),
@@ -626,14 +629,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary.withValues(alpha: 0.8),
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ),
               const SizedBox(height: 6),
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: AppColors.card,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.border),
                 ),
@@ -643,12 +646,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: Colors.white,
                   ),
                   decoration: const InputDecoration(
                     hintText: 'e.g. +251 911 000 001',
                     hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 14),
-                    prefixIcon: Icon(Icons.phone_outlined, color: AppColors.primary, size: 20),
+                    prefixIcon: Icon(Icons.phone_outlined, color: AppColors.neonCyan, size: 20),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
@@ -664,7 +667,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary.withValues(alpha: 0.8),
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -707,7 +710,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
+                        color: AppColors.neonCyan,
                       ),
                     ),
                   ),
@@ -724,13 +727,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                       });
                     },
-                    icon: const Icon(Icons.auto_fix_high_rounded, size: 14, color: AppColors.primary),
+                    icon: const Icon(Icons.auto_fix_high_rounded, size: 14, color: AppColors.accentBlue),
                     label: const Text(
                       'Fill Demo Rider',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
+                        color: AppColors.accentBlue,
                       ),
                     ),
                     style: TextButton.styleFrom(
@@ -769,10 +772,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: AppColors.neonCyan,
                         ),
                       ),
                     ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
                   ],
                 ),
               ),

@@ -248,7 +248,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: const Text(
@@ -256,13 +256,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
+            icon: const Icon(Icons.edit_outlined, color: AppColors.neonCyan),
             onPressed: _showEditProfileDialog,
           ),
         ],
@@ -323,7 +323,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -339,15 +339,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
+                      color: AppColors.card,
                       borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: Text(
                       'ID: ${profile.id}',
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
+                        color: AppColors.neonCyan,
                       ),
                     ),
                   ),
@@ -371,7 +372,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: _buildMetricCard(
                     title: 'Total Trips',
                     value: '${profile.totalDeliveries}',
-                    color: AppColors.primary,
+                    color: AppColors.neonCyan,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -379,7 +380,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: _buildMetricCard(
                     title: 'Total Earned',
                     value: 'ETB ${(profile.totalEarnings / 1000).toStringAsFixed(1)}k',
-                    color: AppColors.successDark,
+                    color: AppColors.success,
                   ),
                 ),
               ],
@@ -390,7 +391,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: AppStyles.radiusLarge,
                 border: Border.all(color: AppColors.border),
                 boxShadow: AppStyles.cardShadow,
@@ -406,11 +407,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          color: Colors.white,
                         ),
                       ),
                       const Icon(Icons.two_wheeler_rounded,
-                          color: AppColors.primary, size: 20),
+                          color: AppColors.neonCyan, size: 20),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -422,7 +423,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               color: AppColors.textSecondary, fontSize: 13)),
                       Text(profile.vehicleType,
                           style: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 13)),
+                              fontWeight: FontWeight.w600, fontSize: 13, color: Colors.white)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -436,7 +437,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 13,
-                              color: AppColors.primary)),
+                              color: AppColors.neonCyan)),
                     ],
                   ),
                 ],
@@ -447,7 +448,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Settings & Actions
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: AppStyles.radiusLarge,
                 border: Border.all(color: AppColors.border),
                 boxShadow: AppStyles.cardShadow,
@@ -522,7 +523,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: AppStyles.radiusLarge,
         border: Border.all(color: AppColors.border),
         boxShadow: AppStyles.cardShadow,
@@ -557,13 +558,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.primary, size: 22),
+      leading: Icon(icon, color: AppColors.neonCyan, size: 22),
       title: Text(
         title,
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
+          color: Colors.white,
         ),
       ),
       trailing: const Icon(Icons.chevron_right_rounded,

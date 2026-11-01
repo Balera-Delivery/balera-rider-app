@@ -50,13 +50,13 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: widget.showBackButton
             ? IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                    color: AppColors.textPrimary, size: 20),
+                    color: Colors.white, size: 20),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
@@ -65,7 +65,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
@@ -80,8 +80,9 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.border),
               ),
               child: Row(
                 children: [
@@ -92,17 +93,11 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
                           color: _selectedTabIndex == 0
-                              ? Colors.white
+                              ? AppColors.card
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(10),
-                          boxShadow: _selectedTabIndex == 0
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.05),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  )
-                                ]
+                          border: _selectedTabIndex == 0
+                              ? Border.all(color: AppColors.neonCyan.withValues(alpha: 0.5))
                               : null,
                         ),
                         child: Center(
@@ -111,10 +106,10 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: _selectedTabIndex == 0
-                                  ? FontWeight.w700
-                                  : FontWeight.w500,
+                                   ? FontWeight.w700
+                                   : FontWeight.w500,
                               color: _selectedTabIndex == 0
-                                  ? AppColors.primary
+                                  ? AppColors.neonCyan
                                   : AppColors.textSecondary,
                             ),
                           ),
@@ -129,17 +124,11 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
                           color: _selectedTabIndex == 1
-                              ? Colors.white
+                              ? AppColors.card
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(10),
-                          boxShadow: _selectedTabIndex == 1
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.05),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  )
-                                ]
+                          border: _selectedTabIndex == 1
+                              ? Border.all(color: AppColors.neonCyan.withValues(alpha: 0.5))
                               : null,
                         ),
                         child: Center(
@@ -151,7 +140,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                                   ? FontWeight.w700
                                   : FontWeight.w500,
                               color: _selectedTabIndex == 1
-                                  ? AppColors.primary
+                                  ? AppColors.neonCyan
                                   : AppColors.textSecondary,
                             ),
                           ),
@@ -222,7 +211,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
   Widget _buildOrderCard(DeliveryOrder order) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: AppStyles.radiusLarge,
         border: Border.all(color: AppColors.border),
         boxShadow: AppStyles.cardShadow,
@@ -254,7 +243,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
+                          color: Colors.white,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -272,7 +261,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                       width: 8,
                       height: 8,
                       decoration: const BoxDecoration(
-                        color: AppColors.textPrimary,
+                        color: AppColors.neonCyan,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -283,7 +272,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
+                          color: Colors.white,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -309,7 +298,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
+                          color: Colors.white,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

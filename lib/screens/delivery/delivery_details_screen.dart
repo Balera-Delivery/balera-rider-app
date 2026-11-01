@@ -143,12 +143,12 @@ class DeliveryDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: AppColors.textPrimary, size: 20),
+              color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -156,14 +156,14 @@ class DeliveryDetailsScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.more_vert_rounded,
-                color: AppColors.textPrimary),
+                color: Colors.white),
             onPressed: () {},
           ),
         ],
@@ -176,7 +176,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: AppStyles.radiusLarge,
                 border: Border.all(color: AppColors.border),
                 boxShadow: AppStyles.cardShadow,
@@ -192,7 +192,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -215,7 +215,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: AppStyles.radiusLarge,
                 border: Border.all(color: AppColors.border),
                 boxShadow: AppStyles.cardShadow,
@@ -226,11 +226,11 @@ class DeliveryDetailsScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
+                      color: AppColors.card,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(Icons.location_on_rounded,
-                        color: AppColors.textPrimary, size: 22),
+                        color: AppColors.neonCyan, size: 22),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -287,7 +287,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: AppStyles.radiusLarge,
                 border: Border.all(color: AppColors.border),
                 boxShadow: AppStyles.cardShadow,
@@ -302,7 +302,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(Icons.location_on_rounded,
-                        color: AppColors.successDark, size: 22),
+                        color: AppColors.success, size: 22),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -375,7 +375,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: AppStyles.radiusLarge,
                 border: Border.all(color: AppColors.border),
               ),
@@ -384,7 +384,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     const Icon(Icons.inventory_2_outlined,
-                        color: AppColors.textSecondary, size: 22),
+                        color: AppColors.neonCyan, size: 22),
                     const SizedBox(width: 14),
                     const Text(
                       'Item',
@@ -400,7 +400,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -416,14 +416,14 @@ class DeliveryDetailsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: AppStyles.radiusLarge,
                 border: Border.all(color: AppColors.border),
               ),
               child: Row(
                 children: [
                   const Icon(Icons.person_outline_rounded,
-                      color: AppColors.textSecondary, size: 22),
+                      color: AppColors.neonCyan, size: 22),
                   const SizedBox(width: 14),
                   const Text(
                     'Customer',
@@ -439,7 +439,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -449,11 +449,11 @@ class DeliveryDetailsScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: const BoxDecoration(
-                        color: AppColors.primaryLight,
+                        color: AppColors.card,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.phone_rounded,
-                          color: AppColors.primary, size: 16),
+                          color: AppColors.neonCyan, size: 16),
                     ),
                   ),
                 ],
@@ -465,7 +465,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: AppStyles.radiusLarge,
                 border: Border.all(color: AppColors.border),
               ),

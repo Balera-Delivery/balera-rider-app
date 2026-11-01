@@ -23,7 +23,7 @@ class AppDrawer extends StatelessWidget {
     final activeOrder = deliveryService.currentDelivery ?? deliveryService.deliveries.first;
 
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       child: SafeArea(
         child: Column(
           children: [
@@ -31,7 +31,7 @@ class AppDrawer extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: const BoxDecoration(
-                color: Color(0xFFF8FAFC),
+                color: AppColors.background,
                 border: Border(bottom: BorderSide(color: AppColors.border)),
               ),
               child: Row(
@@ -40,11 +40,12 @@ class AppDrawer extends StatelessWidget {
                     width: 54,
                     height: 54,
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.card,
                       shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.border),
                       boxShadow: AppStyles.cardShadow,
                     ),
-                    child: const Icon(Icons.person, color: Colors.white, size: 30),
+                    child: const Icon(Icons.person, color: AppColors.neonCyan, size: 30),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -294,13 +295,13 @@ class AppDrawer extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.primary, size: 22),
+      leading: Icon(icon, color: AppColors.neonCyan, size: 22),
       title: Text(
         title,
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
-          color: AppColors.textPrimary,
+          color: Colors.white,
         ),
       ),
       dense: true,
