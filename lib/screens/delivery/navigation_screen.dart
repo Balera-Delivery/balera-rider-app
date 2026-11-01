@@ -23,9 +23,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // 1. Simulated Interactive Map Canvas
+          // 1. Real Interactive OpenStreetMap
           Positioned.fill(
             child: RouteMapWidget(
+              pickupLat: widget.order.pickupLatitude,
+              pickupLng: widget.order.pickupLongitude,
+              destinationLat: widget.order.destinationLatitude,
+              destinationLng: widget.order.destinationLongitude,
               onEndTrip: () => _goToPickupConfirmation(),
             ),
           ),

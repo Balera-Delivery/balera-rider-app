@@ -4,7 +4,9 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_styles.dart';
 import '../../models/delivery_order.dart';
 import '../../services/delivery_service.dart';
+import '../../services/permission_prompt_service.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/route_map_painter.dart';
 import '../../widgets/status_badge.dart';
 import '../delivery/delivery_details_screen.dart';
 import '../delivery/otp_verification_screen.dart';
@@ -34,6 +36,9 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
     _deliveryService.refreshAll().catchError((_) {});
     _startGpsHeartbeat();
     _startPeriodicSync();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      RiderPermissionPromptService.checkAndPromptPermissions(context);
+    });
   }
 
   void _startGpsHeartbeat() {
@@ -150,12 +155,15 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
             ),
             Row(
               children: [
-                Text(
-                  profile.fullName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                Flexible(
+                  child: Text(
+                    profile.fullName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(width: 4),
@@ -526,16 +534,22 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.person_outline_rounded, size: 16, color: AppColors.textSecondary),
-                                const SizedBox(width: 6),
-                                Text(
-                                  currentDelivery.customerName,
-                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
-                                ),
-                              ],
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.person_outline_rounded, size: 16, color: AppColors.textSecondary),
+                                  const SizedBox(width: 6),
+                                  Flexible(
+                                    child: Text(
+                                      currentDelivery.customerName,
+                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
+                            const SizedBox(width: 8),
                             Text(
                               currentDelivery.customerPhone,
                               style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
@@ -602,6 +616,22 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Real Live OpenStreetMap Delivery Route Preview
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: SizedBox(
+                          height: 190,
+                          width: double.infinity,
+                          child: RouteMapWidget(
+                            pickupLat: currentDelivery.pickupLatitude,
+                            pickupLng: currentDelivery.pickupLongitude,
+                            destinationLat: currentDelivery.destinationLatitude,
+                            destinationLng: currentDelivery.destinationLongitude,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 18),
 
@@ -726,6 +756,16 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                         style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      // Live Area Coverage OpenStreetMap
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: const SizedBox(
+                          height: 180,
+                          width: double.infinity,
+                          child: RouteMapWidget(),
                         ),
                       ),
                     ],

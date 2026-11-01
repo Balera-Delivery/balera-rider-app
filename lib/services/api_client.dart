@@ -101,12 +101,17 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> post(String path, {dynamic body}) async {
+  Future<dynamic> post(String path, {dynamic body, Map<String, String>? headers}) async {
     try {
       final uri = _buildUri(path);
+      final randomPart = (DateTime.now().microsecondsSinceEpoch ^ (body?.hashCode ?? 0)).abs().toRadixString(36);
+      final extra = <String, String>{
+        'Idempotency-Key': 'rider_${DateTime.now().millisecondsSinceEpoch}_$randomPart',
+        if (headers != null) ...headers,
+      };
       final response = await http.post(
         uri,
-        headers: _buildHeaders(),
+        headers: _buildHeaders(extraHeaders: extra),
         body: body != null ? jsonEncode(body) : null,
       );
       return _handleResponse(response);
@@ -118,12 +123,17 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> put(String path, {dynamic body}) async {
+  Future<dynamic> put(String path, {dynamic body, Map<String, String>? headers}) async {
     try {
       final uri = _buildUri(path);
+      final randomPart = (DateTime.now().microsecondsSinceEpoch ^ (body?.hashCode ?? 0)).abs().toRadixString(36);
+      final extra = <String, String>{
+        'Idempotency-Key': 'rider_${DateTime.now().millisecondsSinceEpoch}_$randomPart',
+        if (headers != null) ...headers,
+      };
       final response = await http.put(
         uri,
-        headers: _buildHeaders(),
+        headers: _buildHeaders(extraHeaders: extra),
         body: body != null ? jsonEncode(body) : null,
       );
       return _handleResponse(response);

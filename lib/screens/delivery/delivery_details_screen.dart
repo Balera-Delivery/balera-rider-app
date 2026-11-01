@@ -6,6 +6,7 @@ import '../../constants/app_styles.dart';
 import '../../models/delivery_order.dart';
 import '../../services/delivery_service.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/route_map_painter.dart';
 import '../../widgets/status_badge.dart';
 import 'navigation_screen.dart';
 import 'otp_verification_screen.dart';
@@ -350,6 +351,22 @@ class DeliveryDetailsScreen extends StatelessWidget {
                         context, order.receiverName, order.dropoffPhone),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // Real Live OpenStreetMap Route Card
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: SizedBox(
+                height: 200,
+                width: double.infinity,
+                child: RouteMapWidget(
+                  pickupLat: order.pickupLatitude,
+                  pickupLng: order.pickupLongitude,
+                  destinationLat: order.destinationLatitude,
+                  destinationLng: order.destinationLongitude,
+                ),
               ),
             ),
             const SizedBox(height: 14),

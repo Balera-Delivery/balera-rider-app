@@ -668,25 +668,28 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 20),
 
               // Register Link
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'New Rider? ',
-                    style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
-                  ),
-                  GestureDetector(
-                    onTap: _showRegisterModal,
-                    child: const Text(
-                      'Apply for Account',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
+              Center(
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    const Text(
+                      'New Rider? ',
+                      style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                    ),
+                    GestureDetector(
+                      onTap: _showRegisterModal,
+                      child: const Text(
+                        'Apply for Account',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
             ],

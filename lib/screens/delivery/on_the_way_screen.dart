@@ -4,6 +4,7 @@ import '../../constants/app_styles.dart';
 import '../../models/delivery_order.dart';
 import '../../services/delivery_service.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/route_map_painter.dart';
 import 'arrived_location_screen.dart';
 
 class OnTheWayScreen extends StatefulWidget {
@@ -72,11 +73,19 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Interactive Route Map at the Top
-              _RiderRouteMapView(
-                pickupAddress: widget.order.pickupLocation,
-                destinationAddress: widget.order.dropoffLocation,
-                height: 220,
+              // 1. Real Interactive OpenStreetMap
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: SizedBox(
+                  height: 220,
+                  width: double.infinity,
+                  child: RouteMapWidget(
+                    pickupLat: widget.order.pickupLatitude,
+                    pickupLng: widget.order.pickupLongitude,
+                    destinationLat: widget.order.destinationLatitude,
+                    destinationLng: widget.order.destinationLongitude,
+                  ),
+                ),
               ),
               const SizedBox(height: 20),
 
