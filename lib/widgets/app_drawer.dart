@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../constants/app_colors.dart';
-import '../constants/app_styles.dart';
 import '../services/delivery_service.dart';
+import '../services/auth_service.dart';
 import '../screens/auth/login_screen.dart';
-import '../screens/delivery/delivery_details_screen.dart';
-import '../screens/delivery/navigation_screen.dart';
-import '../screens/delivery/pickup_confirmation_screen.dart';
-import '../screens/delivery/on_the_way_screen.dart';
-import '../screens/delivery/arrived_location_screen.dart';
-import '../screens/delivery/otp_verification_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -16,18 +11,81 @@ class AppDrawer extends StatelessWidget {
 
   const AppDrawer({super.key, this.onSelectTab});
 
+  Future<void> _makePhoneCall(String phone) async {
+    final cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
+    if (cleanPhone.isEmpty) return;
+    final uri = Uri.parse('tel:$cleanPhone');
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      }
+    } catch (_) {}
+  }
+
+  void _showSupportDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: const [
+            Icon(Icons.headset_mic_rounded, color: AppColors.primary),
+            SizedBox(width: 10),
+            Text('Dispatch Hotline', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              'Need immediate assistance with routes, customer phone numbers, or active deliveries in Bale?',
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.35),
+            ),
+            SizedBox(height: 12),
+            Text(
+              '📞 Hotline: +251 911 000 000',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+            ),
+            Text(
+              'Available 24/7 for all Balera registered riders.',
+              style: TextStyle(fontSize: 11.5, color: AppColors.textMuted),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.phone, size: 16, color: Colors.white),
+            label: const Text('Call Dispatch', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.success,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () {
+              Navigator.pop(ctx);
+              _makePhoneCall('+251911000000');
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final deliveryService = DeliveryService();
     final profile = deliveryService.riderProfile;
-    final activeOrder = deliveryService.currentDelivery ?? deliveryService.deliveries.first;
 
     return Drawer(
       backgroundColor: Colors.white,
       child: SafeArea(
         child: Column(
           children: [
-            // Drawer Header with Rider Card (Matching Customer App)
+            // Rider Profile Header Card
             Container(
               padding: const EdgeInsets.all(20),
               decoration: const BoxDecoration(
@@ -60,6 +118,8 @@ class AppDrawer extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -69,27 +129,35 @@ class AppDrawer extends StatelessWidget {
                             color: Colors.white70,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: profile.isOnline ? const Color(0xFF4ADE80) : const Color(0xFFF87171),
-                                shape: BoxShape.circle,
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 7,
+                                height: 7,
+                                decoration: BoxDecoration(
+                                  color: profile.isOnline ? const Color(0xFF4ADE80) : const Color(0xFFF87171),
+                                  shape: BoxShape.circle,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              profile.isOnline ? 'Online' : 'Offline',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                              const SizedBox(width: 6),
+                              Text(
+                                profile.isOnline ? 'Online & Active' : 'Offline',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -98,22 +166,15 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
 
-            // Navigation List (Quick 12-Screen Navigator)
+            // Production Rider Navigation Menu (All developer numbered items removed!)
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      'MAIN TABS',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textMuted),
-                    ),
-                  ),
                   _drawerItem(
                     context,
-                    icon: Icons.dashboard_outlined,
-                    title: '03. Rider Dashboard',
+                    icon: Icons.home_rounded,
+                    title: 'Home Dashboard',
                     onTap: () {
                       Navigator.pop(context);
                       onSelectTab?.call(0);
@@ -121,8 +182,8 @@ class AppDrawer extends StatelessWidget {
                   ),
                   _drawerItem(
                     context,
-                    icon: Icons.local_shipping_outlined,
-                    title: '04. Assigned Deliveries',
+                    icon: Icons.inventory_2_rounded,
+                    title: 'My Deliveries (Queue)',
                     onTap: () {
                       Navigator.pop(context);
                       onSelectTab?.call(1);
@@ -130,8 +191,8 @@ class AppDrawer extends StatelessWidget {
                   ),
                   _drawerItem(
                     context,
-                    icon: Icons.history_rounded,
-                    title: '12. Delivery History',
+                    icon: Icons.account_balance_wallet_rounded,
+                    title: 'Shift & Earnings',
                     onTap: () {
                       Navigator.pop(context);
                       onSelectTab?.call(2);
@@ -139,109 +200,16 @@ class AppDrawer extends StatelessWidget {
                   ),
                   _drawerItem(
                     context,
-                    icon: Icons.person_outline_rounded,
-                    title: 'Rider Profile',
+                    icon: Icons.history_rounded,
+                    title: 'Delivery History',
                     onTap: () {
                       Navigator.pop(context);
-                      onSelectTab?.call(3);
-                    },
-                  ),
-                  const Divider(height: 24),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Text(
-                      'DELIVERY WORKFLOW STEPS',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textMuted),
-                    ),
-                  ),
-                  _drawerItem(
-                    context,
-                    icon: Icons.receipt_long_outlined,
-                    title: '05. Delivery Details',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => DeliveryDetailsScreen(order: activeOrder),
-                        ),
-                      );
+                      onSelectTab?.call(2);
                     },
                   ),
                   _drawerItem(
                     context,
-                    icon: Icons.navigation_outlined,
-                    title: '06. Turn-by-Turn Navigation',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => NavigationScreen(order: activeOrder),
-                        ),
-                      );
-                    },
-                  ),
-                  _drawerItem(
-                    context,
-                    icon: Icons.inventory_2_outlined,
-                    title: '07. Pickup Confirmation',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => PickupConfirmationScreen(order: activeOrder),
-                        ),
-                      );
-                    },
-                  ),
-                  _drawerItem(
-                    context,
-                    icon: Icons.electric_moped_outlined,
-                    title: '08. On The Way',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => OnTheWayScreen(order: activeOrder),
-                        ),
-                      );
-                    },
-                  ),
-                  _drawerItem(
-                    context,
-                    icon: Icons.location_on_outlined,
-                    title: '09. Arrived at Location',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ArrivedLocationScreen(order: activeOrder),
-                        ),
-                      );
-                    },
-                  ),
-                  _drawerItem(
-                    context,
-                    icon: Icons.pin_outlined,
-                    title: '10. OTP Verification',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => OtpVerificationScreen(order: activeOrder),
-                        ),
-                      );
-                    },
-                  ),
-                  const Divider(height: 24),
-                  _drawerItem(
-                    context,
-                    icon: Icons.notifications_none_rounded,
+                    icon: Icons.notifications_outlined,
                     title: 'Notifications',
                     onTap: () {
                       Navigator.pop(context);
@@ -251,6 +219,25 @@ class AppDrawer extends StatelessWidget {
                           builder: (_) => const NotificationsScreen(),
                         ),
                       );
+                    },
+                  ),
+                  const Divider(height: 20, color: Color(0xFFF1F5F9)),
+                  _drawerItem(
+                    context,
+                    icon: Icons.headset_mic_rounded,
+                    title: 'Bale Dispatch Support',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showSupportDialog(context);
+                    },
+                  ),
+                  _drawerItem(
+                    context,
+                    icon: Icons.person_outline_rounded,
+                    title: 'Rider Profile & Settings',
+                    onTap: () {
+                      Navigator.pop(context);
+                      onSelectTab?.call(3);
                     },
                   ),
                 ],
@@ -269,17 +256,20 @@ class AppDrawer extends StatelessWidget {
                   'Logout',
                   style: TextStyle(
                     color: AppColors.danger,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    (route) => false,
-                  );
+                  await AuthService().logout();
+                  if (context.mounted) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      (route) => false,
+                    );
+                  }
                 },
               ),
             ),
@@ -301,12 +291,11 @@ class AppDrawer extends StatelessWidget {
         title,
         style: const TextStyle(
           fontSize: 14,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
         ),
       ),
       dense: true,
-      visualDensity: VisualDensity.compact,
       onTap: onTap,
     );
   }
