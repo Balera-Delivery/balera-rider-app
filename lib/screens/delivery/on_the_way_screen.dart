@@ -54,7 +54,7 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Colors.white, size: 20),
+              color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -62,7 +62,7 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
         centerTitle: true,
@@ -95,7 +95,7 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 6),
@@ -130,22 +130,22 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.neonCyan.withValues(alpha: 0.15),
+                            color: const Color(0xFFEFF6FF),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.neonCyan.withValues(alpha: 0.4)),
+                            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                           ),
                           child: const Text(
                             'En Route',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.neonCyan,
+                              color: AppColors.primary,
                             ),
                           ),
                         ),
@@ -183,7 +183,7 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                 ),
                               ),
                             ],
@@ -206,11 +206,11 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: AppColors.neonCyan.withValues(alpha: 0.18),
+                            color: const Color(0xFFEFF6FF),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.location_on_rounded,
-                              color: AppColors.neonCyan, size: 16),
+                              color: AppColors.primary, size: 16),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -230,7 +230,7 @@ class _OnTheWayScreenState extends State<OnTheWayScreen> {
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                 ),
                               ),
                             ],

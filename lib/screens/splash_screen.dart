@@ -224,20 +224,20 @@ class _SplashScreenState extends State<SplashScreen> {
     final isShortScreen = size.height < 700;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070E22),
+      backgroundColor: Colors.white,
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
-          color: Color(0xFF070E22),
+          color: Colors.white,
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF070E22),
-              Color(0xFF0C1733),
-              Color(0xFF0F1E3D),
-              Color(0xFF070E22),
+              Colors.white,
+              Color(0xFFFAFCFF),
+              Color(0xFFF1F6FD),
+              Color(0xFFE8F1FC),
             ],
             stops: [0.0, 0.35, 0.70, 1.0],
           ),
@@ -261,7 +261,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           height: 7,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Color(0xFF00E5FF),
+                            color: Color(0xFF0052CC),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -275,7 +275,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                   fontSize: 19,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 1.5,
-                                  color: Colors.white,
+                                  color: const Color(0xFF003893),
                                 ),
                               ),
                               TextSpan(
@@ -284,7 +284,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                   fontSize: 19,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 1.5,
-                                  color: const Color(0xFF00E5FF),
+                                  color: const Color(0xFF0052CC),
                                 ),
                               ),
                             ],
@@ -296,7 +296,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           height: 7,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Color(0xFF00E5FF),
+                            color: Color(0xFF0052CC),
                           ),
                         ),
                       ],
@@ -309,10 +309,10 @@ class _SplashScreenState extends State<SplashScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 3.5),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0F1E3D),
+                        color: const Color(0xFF0047BA).withValues(alpha: 0.07),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: const Color(0xFF1E356A),
+                          color: const Color(0xFF0047BA).withValues(alpha: 0.12),
                           width: 1,
                         ),
                       ),
@@ -321,7 +321,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF00E5FF),
+                          color: const Color(0xFF0047BA),
                           letterSpacing: 0.3,
                         ),
                       ),
@@ -335,7 +335,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF94A3B8),
+                        color: const Color(0xFF64748B),
                         letterSpacing: 0.2,
                       ),
                     ),
@@ -390,14 +390,14 @@ class _SplashScreenState extends State<SplashScreen> {
                                   height: heroDiameter,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: const Color(0xFF0F1E3D),
+                                    color: Colors.white,
                                     border: Border.all(
-                                      color: const Color(0xFF1E356A),
-                                      width: 3.5,
+                                      color: Colors.white,
+                                      width: 4.5,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF00E5FF)
+                                        color: const Color(0xFF0047BA)
                                             .withValues(alpha: 0.16),
                                         blurRadius: 28,
                                         spreadRadius: 2,
@@ -408,7 +408,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                   child: ClipOval(
                                     child: item.isLogo
                                         ? Container(
-                                            color: const Color(0xFF0F1E3D),
+                                            color: Colors.white,
                                             padding: const EdgeInsets.all(22.0),
                                             child: Image.asset(
                                               item.imagePath,
@@ -500,7 +500,7 @@ class _SplashScreenState extends State<SplashScreen> {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: isShortScreen ? 21 : 23,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: const Color(0xFF0F172A),
                               letterSpacing: -0.3,
                             ),
                             textAlign: TextAlign.center,
@@ -519,7 +519,7 @@ class _SplashScreenState extends State<SplashScreen> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: isShortScreen ? 13.5 : 14.5,
                                 fontWeight: FontWeight.w400,
-                                color: const Color(0xFF94A3B8),
+                                color: const Color(0xFF64748B),
                                 height: 1.5,
                               ),
                               textAlign: TextAlign.center,
@@ -588,8 +588,8 @@ class _SplashScreenState extends State<SplashScreen> {
                             height: 7,
                             decoration: BoxDecoration(
                               color: _currentPage == index
-                                  ? const Color(0xFF00E5FF)
-                                  : const Color(0xFF1E356A),
+                                  ? const Color(0xFF0047BA)
+                                  : const Color(0xFFCBD5E1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -659,8 +659,8 @@ class _SplashScreenState extends State<SplashScreen> {
                             height: 7,
                             decoration: BoxDecoration(
                               color: _currentPage == index
-                                  ? const Color(0xFF00E5FF)
-                                  : const Color(0xFF1E356A),
+                                  ? const Color(0xFF0047BA)
+                                  : const Color(0xFFCBD5E1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),

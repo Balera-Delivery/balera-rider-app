@@ -9,8 +9,8 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
     ),
   );
   await AuthService().init();
@@ -27,21 +27,21 @@ class BalerraRiderApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.dark,
         fontFamily: 'Roboto',
-        colorScheme: const ColorScheme.dark(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
           primary: AppColors.primary,
-          secondary: AppColors.neonCyan,
-          surface: AppColors.surface,
+          secondary: AppColors.success,
+          surface: Colors.white,
         ),
         scaffoldBackgroundColor: AppColors.background,
         appBarTheme: const AppBarTheme(
-          backgroundColor: AppColors.background,
+          backgroundColor: Colors.white,
           elevation: 0,
           scrolledUnderElevation: 0,
-          iconTheme: IconThemeData(color: Colors.white),
+          iconTheme: IconThemeData(color: AppColors.textPrimary),
           titleTextStyle: TextStyle(
-            color: Colors.white,
+            color: AppColors.textPrimary,
             fontSize: 18,
             fontWeight: FontWeight.w700,
           ),
@@ -60,7 +60,7 @@ class BalerraRiderApp extends StatelessWidget {
           ),
         ),
         cardTheme: CardThemeData(
-          color: AppColors.card,
+          color: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),

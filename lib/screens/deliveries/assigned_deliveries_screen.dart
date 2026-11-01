@@ -56,7 +56,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
         leading: widget.showBackButton
             ? IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white, size: 20),
+                    color: AppColors.textPrimary, size: 20),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
@@ -65,7 +65,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
         centerTitle: true,
@@ -80,7 +80,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.border),
               ),
@@ -93,11 +93,17 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
                           color: _selectedTabIndex == 0
-                              ? AppColors.card
+                              ? Colors.white
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(10),
-                          border: _selectedTabIndex == 0
-                              ? Border.all(color: AppColors.neonCyan.withValues(alpha: 0.5))
+                          boxShadow: _selectedTabIndex == 0
+                              ? [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.05),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
                               : null,
                         ),
                         child: Center(
@@ -106,10 +112,10 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: _selectedTabIndex == 0
-                                   ? FontWeight.w700
-                                   : FontWeight.w500,
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
                               color: _selectedTabIndex == 0
-                                  ? AppColors.neonCyan
+                                  ? AppColors.primary
                                   : AppColors.textSecondary,
                             ),
                           ),
@@ -124,11 +130,17 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
                           color: _selectedTabIndex == 1
-                              ? AppColors.card
+                              ? Colors.white
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(10),
-                          border: _selectedTabIndex == 1
-                              ? Border.all(color: AppColors.neonCyan.withValues(alpha: 0.5))
+                          boxShadow: _selectedTabIndex == 1
+                              ? [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.05),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
                               : null,
                         ),
                         child: Center(
@@ -140,7 +152,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                                   ? FontWeight.w700
                                   : FontWeight.w500,
                               color: _selectedTabIndex == 1
-                                  ? AppColors.neonCyan
+                                  ? AppColors.primary
                                   : AppColors.textSecondary,
                             ),
                           ),
@@ -243,7 +255,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -261,7 +273,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                       width: 8,
                       height: 8,
                       decoration: const BoxDecoration(
-                        color: AppColors.neonCyan,
+                        color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -272,7 +284,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -298,7 +310,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -307,7 +319,7 @@ class _AssignedDeliveriesScreenState extends State<AssignedDeliveriesScreen> {
                   ],
                 ),
                 const SizedBox(height: 14),
-                const Divider(height: 1, color: AppColors.divider),
+                const Divider(height: 1, color: AppColors.border),
                 const SizedBox(height: 12),
 
                 // Bottom Row: ETA & Distance

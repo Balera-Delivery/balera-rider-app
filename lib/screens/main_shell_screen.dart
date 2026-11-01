@@ -48,90 +48,151 @@ class _MainShellScreenState extends State<MainShellScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          border: const Border(
-            top: BorderSide(color: AppColors.border, width: 1.0),
-          ),
+          color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.45),
-              blurRadius: 18,
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 16,
               offset: const Offset(0, -4),
             ),
           ],
+          border: const Border(
+            top: BorderSide(color: Color(0xFFF1F5F9), width: 1.2),
+          ),
         ),
         child: SafeArea(
           top: false,
-          child: Theme(
-            data: Theme.of(context).copyWith(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-            ),
-            child: BottomNavigationBar(
-              currentIndex: _currentIndex,
-              onTap: _onTabSelected,
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: AppColors.surface,
-              selectedItemColor: AppColors.neonCyan,
-              unselectedItemColor: AppColors.textMuted,
-              selectedLabelStyle: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.2,
-              ),
-              unselectedLabelStyle: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-              elevation: 0,
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Padding(
-                    padding: EdgeInsets.only(bottom: 2),
-                    child: Icon(Icons.home_outlined),
-                  ),
-                  activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 2),
-                    child: Icon(Icons.home_rounded, color: AppColors.neonCyan),
-                  ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // 1. Home Tab
+                _buildNavItem(
+                  index: 0,
+                  icon: Icons.home_outlined,
+                  activeIcon: Icons.home_rounded,
                   label: 'Home',
+                  isSelected: _currentIndex == 0,
+                  onTap: () => _onTabSelected(0),
                 ),
-                BottomNavigationBarItem(
-                  icon: Padding(
-                    padding: EdgeInsets.only(bottom: 2),
-                    child: Icon(Icons.two_wheeler_outlined),
-                  ),
-                  activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 2),
-                    child: Icon(Icons.two_wheeler_rounded, color: AppColors.neonCyan),
-                  ),
-                  label: 'Deliveries',
+
+                // 2. Deliveries Tab
+                _buildNavItem(
+                  index: 1,
+                  icon: Icons.inventory_2_outlined,
+                  activeIcon: Icons.inventory_2_rounded,
+                  label: 'Orders',
+                  isSelected: _currentIndex == 1,
+                  onTap: () => _onTabSelected(1),
                 ),
-                BottomNavigationBarItem(
-                  icon: Padding(
-                    padding: EdgeInsets.only(bottom: 2),
-                    child: Icon(Icons.receipt_long_outlined),
+
+                // 3. Center Prominent Rider Bike Button (Floating)
+                Transform.translate(
+                  offset: const Offset(0, -12),
+                  child: GestureDetector(
+                    onTap: () => _onTabSelected(1),
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF0056D2), Color(0xFF003D9E)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 3.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.45),
+                              blurRadius: 14,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.two_wheeler_rounded,
+                          color: Colors.white,
+                          size: 26,
+                        ),
+                      ),
+                    ),
                   ),
-                  activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 2),
-                    child: Icon(Icons.receipt_long_rounded, color: AppColors.neonCyan),
-                  ),
+                ),
+
+                // 4. History Tab
+                _buildNavItem(
+                  index: 2,
+                  icon: Icons.receipt_long_outlined,
+                  activeIcon: Icons.receipt_long_rounded,
                   label: 'History',
+                  isSelected: _currentIndex == 2,
+                  onTap: () => _onTabSelected(2),
                 ),
-                BottomNavigationBarItem(
-                  icon: Padding(
-                    padding: EdgeInsets.only(bottom: 2),
-                    child: Icon(Icons.person_outline_rounded),
-                  ),
-                  activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 2),
-                    child: Icon(Icons.person_rounded, color: AppColors.neonCyan),
-                  ),
-                  label: 'Profile',
+
+                // 5. Profile Tab
+                _buildNavItem(
+                  index: 3,
+                  icon: Icons.person_outline_rounded,
+                  activeIcon: Icons.person_rounded,
+                  label: 'Account',
+                  isSelected: _currentIndex == 3,
+                  onTap: () => _onTabSelected(3),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required int index,
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+              decoration: BoxDecoration(
+                color: isSelected ? const Color(0xFFEFF6FF) : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                isSelected ? activeIcon : icon,
+                size: 22,
+                color: isSelected ? AppColors.primary : AppColors.textMuted,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? AppColors.primary : AppColors.textMuted,
+              ),
+            ),
+          ],
         ),
       ),
     );

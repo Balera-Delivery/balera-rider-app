@@ -21,20 +21,20 @@ class StatusBadge extends StatelessWidget {
       case DeliveryStatus.assigned:
       case DeliveryStatus.accepted:
       case DeliveryStatus.completed:
-        bgColor = AppColors.success.withValues(alpha: 0.16);
-        textColor = const Color(0xFF34D399);
+        bgColor = AppColors.successLight;
+        textColor = AppColors.successDark;
         break;
       case DeliveryStatus.arrivedAtPickup:
       case DeliveryStatus.pickedUp:
       case DeliveryStatus.onTheWay:
       case DeliveryStatus.arrivedAtLocation:
       case DeliveryStatus.delivered:
-        bgColor = AppColors.neonCyan.withValues(alpha: 0.16);
-        textColor = AppColors.neonCyan;
+        bgColor = const Color(0xFFEFF6FF);
+        textColor = AppColors.primary;
         break;
       case DeliveryStatus.cancelled:
-        bgColor = AppColors.danger.withValues(alpha: 0.16);
-        textColor = const Color(0xFFF87171);
+        bgColor = AppColors.dangerLight;
+        textColor = AppColors.danger;
         break;
     }
 
@@ -43,7 +43,6 @@ class StatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: textColor.withValues(alpha: 0.3), width: 1),
       ),
       child: Text(
         customLabel ?? status.displayName,

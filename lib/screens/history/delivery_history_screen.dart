@@ -182,7 +182,7 @@ class _DeliveryHistoryScreenState extends State<DeliveryHistoryScreen> {
         leading: widget.showBackButton
             ? IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white, size: 20),
+                    color: AppColors.textPrimary, size: 20),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
@@ -191,7 +191,7 @@ class _DeliveryHistoryScreenState extends State<DeliveryHistoryScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
         centerTitle: true,
@@ -206,7 +206,7 @@ class _DeliveryHistoryScreenState extends State<DeliveryHistoryScreen> {
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.border),
               ),
@@ -281,10 +281,16 @@ class _DeliveryHistoryScreenState extends State<DeliveryHistoryScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.card : Colors.transparent,
+            color: isSelected ? Colors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
-            border: isSelected
-                ? Border.all(color: AppColors.neonCyan.withValues(alpha: 0.5))
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
                 : null,
           ),
           child: Center(
@@ -293,7 +299,7 @@ class _DeliveryHistoryScreenState extends State<DeliveryHistoryScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? AppColors.neonCyan : AppColors.textSecondary,
+                color: isSelected ? AppColors.primary : AppColors.textSecondary,
               ),
             ),
           ),
@@ -328,7 +334,7 @@ class _DeliveryHistoryScreenState extends State<DeliveryHistoryScreen> {
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const Spacer(),

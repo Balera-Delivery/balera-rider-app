@@ -148,7 +148,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Colors.white, size: 20),
+              color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -156,14 +156,14 @@ class DeliveryDetailsScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.more_vert_rounded,
-                color: Colors.white),
+                color: AppColors.textPrimary),
             onPressed: () {},
           ),
         ],
@@ -192,7 +192,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -226,11 +226,11 @@ class DeliveryDetailsScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.card,
+                      color: const Color(0xFFEFF6FF),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(Icons.location_on_rounded,
-                        color: AppColors.neonCyan, size: 22),
+                        color: AppColors.primary, size: 22),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -384,7 +384,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     const Icon(Icons.inventory_2_outlined,
-                        color: AppColors.neonCyan, size: 22),
+                        color: AppColors.primary, size: 22),
                     const SizedBox(width: 14),
                     const Text(
                       'Item',
@@ -400,7 +400,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -423,7 +423,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
               child: Row(
                 children: [
                   const Icon(Icons.person_outline_rounded,
-                      color: AppColors.neonCyan, size: 22),
+                      color: AppColors.primary, size: 22),
                   const SizedBox(width: 14),
                   const Text(
                     'Customer',
@@ -439,7 +439,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -449,11 +449,11 @@ class DeliveryDetailsScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: const BoxDecoration(
-                        color: AppColors.card,
+                        color: Color(0xFFEFF6FF),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.phone_rounded,
-                          color: AppColors.neonCyan, size: 16),
+                          color: AppColors.primary, size: 16),
                     ),
                   ),
                 ],

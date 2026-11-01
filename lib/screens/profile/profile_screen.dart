@@ -256,13 +256,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit_outlined, color: AppColors.neonCyan),
+            icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
             onPressed: _showEditProfileDialog,
           ),
         ],
@@ -323,7 +323,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -339,7 +339,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.card,
+                      color: const Color(0xFFEFF6FF),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: AppColors.border),
                     ),
@@ -348,7 +348,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.neonCyan,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
@@ -372,7 +372,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: _buildMetricCard(
                     title: 'Total Trips',
                     value: '${profile.totalDeliveries}',
-                    color: AppColors.neonCyan,
+                    color: AppColors.primary,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -407,11 +407,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const Icon(Icons.two_wheeler_rounded,
-                          color: AppColors.neonCyan, size: 20),
+                          color: AppColors.primary, size: 20),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -423,7 +423,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               color: AppColors.textSecondary, fontSize: 13)),
                       Text(profile.vehicleType,
                           style: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 13, color: Colors.white)),
+                              fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.textPrimary)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -437,7 +437,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 13,
-                              color: AppColors.neonCyan)),
+                              color: AppColors.primary)),
                     ],
                   ),
                 ],
@@ -558,13 +558,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.neonCyan, size: 22),
+      leading: Icon(icon, color: AppColors.primary, size: 22),
       title: Text(
         title,
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: AppColors.textPrimary,
         ),
       ),
       trailing: const Icon(Icons.chevron_right_rounded,

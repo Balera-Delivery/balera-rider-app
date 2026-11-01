@@ -23,29 +23,30 @@ class AppDrawer extends StatelessWidget {
     final activeOrder = deliveryService.currentDelivery ?? deliveryService.deliveries.first;
 
     return Drawer(
-      backgroundColor: AppColors.surface,
+      backgroundColor: Colors.white,
       child: SafeArea(
         child: Column(
           children: [
-            // Drawer Header with Rider Card
+            // Drawer Header with Rider Card (Matching Customer App)
             Container(
               padding: const EdgeInsets.all(20),
               decoration: const BoxDecoration(
-                color: AppColors.background,
-                border: Border(bottom: BorderSide(color: AppColors.border)),
+                gradient: LinearGradient(
+                  colors: [Color(0xFF003893), Color(0xFF0047BA)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
               child: Row(
                 children: [
                   Container(
-                    width: 54,
-                    height: 54,
-                    decoration: BoxDecoration(
-                      color: AppColors.card,
+                    width: 52,
+                    height: 52,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.border),
-                      boxShadow: AppStyles.cardShadow,
                     ),
-                    child: const Icon(Icons.person, color: AppColors.neonCyan, size: 30),
+                    child: const Icon(Icons.person, color: AppColors.primary, size: 30),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -57,7 +58,7 @@ class AppDrawer extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -65,7 +66,7 @@ class AppDrawer extends StatelessWidget {
                           profile.phoneNumber,
                           style: const TextStyle(
                             fontSize: 13,
-                            color: AppColors.textSecondary,
+                            color: Colors.white70,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -75,17 +76,17 @@ class AppDrawer extends StatelessWidget {
                               width: 8,
                               height: 8,
                               decoration: BoxDecoration(
-                                color: profile.isOnline ? AppColors.success : AppColors.textMuted,
+                                color: profile.isOnline ? const Color(0xFF4ADE80) : const Color(0xFFF87171),
                                 shape: BoxShape.circle,
                               ),
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              profile.isOnline ? 'Online (Available)' : 'Offline',
-                              style: TextStyle(
+                              profile.isOnline ? 'Online' : 'Offline',
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: profile.isOnline ? AppColors.successDark : AppColors.textMuted,
+                                color: Colors.white,
                               ),
                             ),
                           ],
@@ -295,13 +296,13 @@ class AppDrawer extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.neonCyan, size: 22),
+      leading: Icon(icon, color: AppColors.primary, size: 22),
       title: Text(
         title,
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
-          color: Colors.white,
+          color: AppColors.textPrimary,
         ),
       ),
       dense: true,

@@ -9,15 +9,15 @@ class AppStyles {
   static const BorderRadius radiusXLarge = BorderRadius.all(Radius.circular(24));
   static const BorderRadius radiusFull = BorderRadius.all(Radius.circular(999));
 
-  // Box Shadows (Tuned for dark obsidian background)
+  // Box Shadows (Matching Customer App)
   static List<BoxShadow> cardShadow = [
     BoxShadow(
-      color: Colors.black.withValues(alpha: 0.35),
+      color: const Color(0xFF0F172A).withValues(alpha: 0.04),
       blurRadius: 16,
       offset: const Offset(0, 4),
     ),
     BoxShadow(
-      color: const Color(0xFF0F1E3D).withValues(alpha: 0.5),
+      color: const Color(0xFF0F172A).withValues(alpha: 0.02),
       blurRadius: 4,
       offset: const Offset(0, 1),
     ),
@@ -25,7 +25,7 @@ class AppStyles {
 
   static List<BoxShadow> activeCardShadow = [
     BoxShadow(
-      color: AppColors.primary.withValues(alpha: 0.28),
+      color: AppColors.primary.withValues(alpha: 0.18),
       blurRadius: 20,
       offset: const Offset(0, 8),
     ),
