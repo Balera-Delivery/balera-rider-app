@@ -1096,7 +1096,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
               ),
               const SizedBox(width: 12),
 
-              // Rating
+              // Success Rate
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(16),
@@ -1114,22 +1114,22 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                           Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFEF3C7),
+                              color: const Color(0xFFDCFCE7),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: const Icon(Icons.bolt_rounded, size: 14, color: Color(0xFFD97706)),
+                            child: const Icon(Icons.verified_rounded, size: 14, color: Color(0xFF16A34A)),
                           ),
                           const SizedBox(width: 6),
                           const Text(
-                            'Rating',
+                            'Success Rate',
                             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                           ),
                         ],
                       ),
                       const SizedBox(height: 10),
-                      Text(
-                        '${(profile.rating * 20).toInt()}%',
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+                      const Text(
+                        '100%',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
                       ),
                       const SizedBox(height: 4),
                       const Text(

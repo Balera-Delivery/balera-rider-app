@@ -508,29 +508,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Performance Cards (Rating, Deliveries, Total Earned)
+            // Performance Cards (Deliveries, Total Earned)
             Row(
               children: [
                 Expanded(
                   child: _buildMetricCard(
-                    title: 'Rating',
-                    value: '${profile.rating} ★',
-                    color: const Color(0xFFF59E0B),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildMetricCard(
-                    title: 'Total Trips',
+                    title: 'Total Deliveries',
                     value: '${profile.totalDeliveries}',
                     color: AppColors.primary,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 Expanded(
                   child: _buildMetricCard(
                     title: 'Total Earned',
-                    value: 'ETB ${(profile.totalEarnings / 1000).toStringAsFixed(1)}k',
+                    value: 'ETB ${profile.totalEarnings.toStringAsFixed(0)}',
                     color: AppColors.success,
                   ),
                 ),
