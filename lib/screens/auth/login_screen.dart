@@ -60,9 +60,16 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() {
-          _errorMessage = e.toString().replaceAll('ApiException: ', '');
-        });
+        final rawMsg = e.toString().replaceAll('ApiException: ', '');
+        if (rawMsg.toLowerCase().contains('pending admin approval') ||
+            rawMsg.toLowerCase().contains('pending_approval') ||
+            rawMsg.toLowerCase().contains('pending approval')) {
+          _showPendingApprovalDialog();
+        } else {
+          setState(() {
+            _errorMessage = rawMsg;
+          });
+        }
       }
     } finally {
       if (mounted) {
@@ -77,7 +84,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final phoneCtrl = TextEditingController(text: '+251');
     final vehicleCtrl = TextEditingController(text: 'TVS Motorcycle Plate AA-');
     final passCtrl = TextEditingController();
-    bool obscureRegisterPass = true;
     bool isRegistering = false;
     String? modalError;
 
@@ -229,6 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   _phoneController.text = registeredPhone;
                                   _passwordController.clear();
                                 });
+                                _showPendingApprovalDialog();
                               }
                             }
                           } catch (err) {
@@ -243,6 +250,84 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showPendingApprovalDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.hourglass_top_rounded, color: AppColors.warning, size: 28),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Application Under Review',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.warningLight,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline, color: AppColors.warningDark, size: 18),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Account Status: Pending Admin Approval',
+                      style: TextStyle(
+                        color: AppColors.warningDark,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+            const Text(
+              'Thank you for registering with Balerra! Your courier application and profile are currently awaiting review by our administrative team.\n\nOnce an administrator approves your account, you will receive a notification and will be able to log in immediately.',
+              style: TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+                height: 1.45,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(
+              'Understood',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

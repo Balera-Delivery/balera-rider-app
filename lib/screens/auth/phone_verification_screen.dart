@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../constants/app_colors.dart';
-import '../../constants/app_styles.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/custom_button.dart';
 
@@ -112,7 +111,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
               ],
             ),
             content: const Text(
-              'Your phone number has been verified successfully. Your account is activated and ready. You can now log in.',
+              'Your phone number has been verified successfully. Your rider application is now pending admin review. You will receive a notification once an administrator approves your account.',
               style: TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.4),
             ),
             actions: [

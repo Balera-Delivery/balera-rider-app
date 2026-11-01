@@ -15,6 +15,7 @@ class AppColors {
 
   static const Color warning = Color(0xFFF59E0B);
   static const Color warningLight = Color(0xFFFEF3C7);
+  static const Color warningDark = Color(0xFFD97706);
 
   static const Color danger = Color(0xFFEF4444); // End trip / Cancelled
   static const Color dangerLight = Color(0xFFFEE2E2);
