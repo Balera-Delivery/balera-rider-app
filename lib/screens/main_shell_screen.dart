@@ -86,47 +86,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
                   onTap: () => _onTabSelected(1),
                 ),
 
-                // 3. Center Prominent Rider Bike Button (Floating)
-                Transform.translate(
-                  offset: const Offset(0, -12),
-                  child: GestureDetector(
-                    onTap: () => _onTabSelected(1),
-                    behavior: HitTestBehavior.opaque,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF0056D2), Color(0xFF003D9E)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 3.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.45),
-                              blurRadius: 14,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.two_wheeler_rounded,
-                          color: Colors.white,
-                          size: 26,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // 4. History Tab
+                // 3. History Tab
                 _buildNavItem(
                   index: 2,
                   icon: Icons.receipt_long_outlined,
@@ -136,7 +96,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
                   onTap: () => _onTabSelected(2),
                 ),
 
-                // 5. Profile Tab
+                // 4. Account Tab
                 _buildNavItem(
                   index: 3,
                   icon: Icons.person_outline_rounded,
