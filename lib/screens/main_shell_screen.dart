@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
-import '../widgets/app_drawer.dart';
 import 'dashboard/rider_dashboard_screen.dart';
 import 'deliveries/assigned_deliveries_screen.dart';
 import 'history/delivery_history_screen.dart';
@@ -41,7 +40,6 @@ class _MainShellScreenState extends State<MainShellScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      drawer: AppDrawer(onSelectTab: _onTabSelected),
       body: IndexedStack(
         index: _currentIndex,
         children: screens,

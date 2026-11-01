@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_styles.dart';
 import '../../services/auth_service.dart';
@@ -31,6 +32,156 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _onUpdate() {
     if (mounted) setState(() {});
+  }
+
+  Future<void> _makePhoneCall(String phone) async {
+    final cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
+    if (cleanPhone.isEmpty) return;
+    final uri = Uri.parse('tel:$cleanPhone');
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      }
+    } catch (_) {}
+  }
+
+  void _showHelpSupportSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(22, 16, 22, 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF6FF),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.headset_mic_rounded, color: AppColors.primary, size: 24),
+                ),
+                const SizedBox(width: 14),
+                const Text(
+                  'Rider Help & Support',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Facing issues with package pickup, customer location, OTP verification, or payments in Bale?',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.4),
+            ),
+            const SizedBox(height: 18),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.support_agent_rounded, color: AppColors.primary, size: 28),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          'Bale Dispatch Hotline',
+                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.textPrimary),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          '+251 911 000 000 • 24/7 Dedicated Support',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            CustomButton(
+              text: 'Call Dispatch (+251 911 000 000)',
+              icon: Icons.phone_in_talk_rounded,
+              backgroundColor: AppColors.success,
+              onPressed: () {
+                Navigator.pop(ctx);
+                _makePhoneCall('+251911000000');
+              },
+            ),
+            const SizedBox(height: 10),
+            CustomButton(
+              text: 'Close',
+              isOutlined: true,
+              onPressed: () => Navigator.pop(ctx),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSafetyGuidelinesDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: const [
+            Icon(Icons.shield_outlined, color: AppColors.primary),
+            SizedBox(width: 10),
+            Text('Safety & Guidelines', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text('1. Always wear your helmet and reflective gear while delivering.', style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4)),
+            SizedBox(height: 8),
+            Text('2. Verify the 4-digit OTP code before releasing any order to the recipient.', style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4)),
+            SizedBox(height: 8),
+            Text('3. Check package integrity and parcel sealing at sender pickup.', style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4)),
+            SizedBox(height: 8),
+            Text('4. In case of customer unreachable or address mismatch, call Bale Dispatch directly from your Account.', style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4)),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Understood', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showEditProfileDialog() {
@@ -462,26 +613,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const Divider(height: 1, color: AppColors.divider),
                   _settingTile(
-                    icon: Icons.support_agent_rounded,
-                    title: 'Dispatch Support Desk',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Contacting Balerra Rider Support (+251 900 112 233)...'),
-                        ),
-                      );
-                    },
+                    icon: Icons.headset_mic_rounded,
+                    title: 'Help & Dispatch Support (24/7)',
+                    subtitle: 'Direct hotline +251 911 000 000',
+                    onTap: _showHelpSupportSheet,
+                  ),
+                  const Divider(height: 1, color: AppColors.divider),
+                  _settingTile(
+                    icon: Icons.shield_outlined,
+                    title: 'Rider Safety & Delivery Guidelines',
+                    onTap: _showSafetyGuidelinesDialog,
                   ),
                   const Divider(height: 1, color: AppColors.divider),
                   _settingTile(
                     icon: Icons.info_outline_rounded,
-                    title: 'About Balerra Delivery',
+                    title: 'About Balera Delivery',
                     onTap: () {
                       showAboutDialog(
                         context: context,
-                        applicationName: 'Balerra Rider App',
+                        applicationName: 'Balera Rider App',
                         applicationVersion: '1.0.0 (Build 1)',
-                        applicationLegalese: '© 2026 Balerra Delivery Management Platform',
+                        applicationLegalese: '© 2026 Balera Delivery Management Platform',
                       );
                     },
                   ),
@@ -555,6 +707,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _settingTile({
     required IconData icon,
     required String title,
+    String? subtitle,
     required VoidCallback onTap,
   }) {
     return ListTile(
@@ -567,6 +720,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: AppColors.textPrimary,
         ),
       ),
+      subtitle: subtitle != null
+          ? Text(
+              subtitle,
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+              ),
+            )
+          : null,
       trailing: const Icon(Icons.chevron_right_rounded,
           color: AppColors.textMuted, size: 20),
       onTap: onTap,

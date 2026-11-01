@@ -293,34 +293,32 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
           // Row 1: Logo (drawer) + Greeting + Notification Bell
           Row(
             children: [
-              // Balera Logo / Drawer Trigger
-              Builder(
-                builder: (ctx) => InkWell(
-                  onTap: () => Scaffold.of(ctx).openDrawer(),
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.8), width: 1.5),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.12),
-                          blurRadius: 6,
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/logo/balera_logo.png',
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => const Icon(
-                          Icons.person,
-                          color: AppColors.primary,
-                          size: 20,
-                        ),
+              // Balera Logo / Profile Shortcut
+              InkWell(
+                onTap: () => widget.onNavigateTab?.call(3),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.8), width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.12),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/logo/balera_logo.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.person,
+                        color: AppColors.primary,
+                        size: 20,
                       ),
                     ),
                   ),
