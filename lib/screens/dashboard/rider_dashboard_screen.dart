@@ -7,6 +7,7 @@ import '../../models/delivery_order.dart';
 import '../../services/delivery_service.dart';
 import '../../services/permission_prompt_service.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/route_map_painter.dart';
 import '../../widgets/status_badge.dart';
 import '../delivery/otp_verification_screen.dart';
 import '../delivery/pickup_confirmation_screen.dart';
@@ -78,6 +79,17 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
     final cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
     if (cleanPhone.isEmpty) return;
     final uri = Uri.parse('tel:$cleanPhone');
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _sendSms(String phone) async {
+    final cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
+    if (cleanPhone.isEmpty) return;
+    final uri = Uri.parse('sms:$cleanPhone');
     try {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri);
@@ -200,7 +212,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
     final unreadNotifs = _deliveryService.unreadNotificationCount;
     final riderFirstName = profile.fullName.split(' ').first;
 
-    // Resolve list of active orders to cycle through with Next / Prev
+    // Resolve list of active orders
     final List<DeliveryOrder> displayOrders = [];
     if (currentDelivery != null) {
       displayOrders.add(currentDelivery);
@@ -221,13 +233,13 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
         bottom: false,
         child: Column(
           children: [
-            // 1. TOP ROYAL BLUE HERO HEADER (Compact, glanceable, matches Customer App)
+            // 1. TOP ROYAL BLUE HERO HEADER
             _buildTopHeroHeader(profile, riderFirstName, unreadNotifs),
 
             // 2. SEGMENTED GLANCE SWITCHER (Active Task | Shift Stats | Services)
             _buildSegmentedSwitcher(displayOrders.length),
 
-            // 3. FIT-PAGE CONTENT (PageView for zero vertical scroll)
+            // 3. FIT-PAGE CONTENT (PageView)
             Expanded(
               child: RefreshIndicator(
                 color: AppColors.primary,
@@ -240,7 +252,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                     setState(() => _selectedPageIndex = idx);
                   },
                   children: [
-                    // PAGE 0: ACTIVE MISSION COCKPIT (With Next / Prev Order Switcher)
+                    // PAGE 0: ACTIVE MISSION LIVE MAP WITH DRAGGABLE/SCROLLABLE BOTTOM SHEET
                     _buildActiveTaskPage(displayOrders),
 
                     // PAGE 1: SHIFT & EARNINGS
@@ -286,7 +298,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
           ),
         ],
       ),
-      padding: const EdgeInsets.fromLTRB(18.0, 10.0, 18.0, 16.0),
+      padding: const EdgeInsets.fromLTRB(18.0, 10.0, 18.0, 14.0),
       child: Column(
         children: [
           // Row 1: Logo (drawer) + Greeting + Notification Bell
@@ -415,11 +427,11 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
           // Row 2: Online / Offline Toggle Bar
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
@@ -490,7 +502,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
   // ---------------------------------------------------------------------------
   Widget _buildSegmentedSwitcher(int activeOrdersCount) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
@@ -528,7 +540,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
         onTap: () => _switchPage(index),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 7),
           decoration: BoxDecoration(
             color: isSelected ? Colors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
@@ -570,51 +582,80 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // 3. PAGE 0: ACTIVE MISSION COCKPIT (With Next / Prev Order Switcher)
+  // 3. PAGE 0: ACTIVE MISSION (LIVE MAP + VERTICALLY SCROLLABLE SHEET)
   // ---------------------------------------------------------------------------
   Widget _buildActiveTaskPage(List<DeliveryOrder> displayOrders) {
     if (displayOrders.isEmpty) {
-      return SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Empty state card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(22),
+      return Stack(
+        children: [
+          // Background Live Map
+          const Positioned.fill(
+            child: RouteMapWidget(isInteractive: true),
+          ),
+          // Clean bottom sheet overlay
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.border),
-                boxShadow: AppStyles.cardShadow,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.14),
+                    blurRadius: 16,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
               ),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    width: 40,
+                    height: 4,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEFF6FF),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFFDBEAFE), width: 2),
+                      color: const Color(0xFFCBD5E1),
+                      borderRadius: BorderRadius.circular(2),
                     ),
-                    child: const Icon(Icons.two_wheeler_rounded, color: AppColors.primary, size: 40),
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Icon(Icons.two_wheeler_rounded, color: AppColors.primary, size: 28),
+                      ),
+                      const SizedBox(width: 14),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Ready for Deliveries',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'Stay online. New orders will appear live on this map.',
+                              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Ready for Deliveries',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Stay online. When Bale customers order, assignments will appear instantly on this screen.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
-                  ),
-                  const SizedBox(height: 20),
                   Row(
                     children: [
                       Expanded(
@@ -648,330 +689,777 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       );
     }
 
     final currentOrder = displayOrders[_currentOrderIndex];
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Order Card Container
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: currentOrder.status == DeliveryStatus.assigned
-                    ? AppColors.primary
-                    : AppColors.border,
-                width: 1.5,
-              ),
-              boxShadow: AppStyles.cardShadow,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top Multi-Order Navigation Switcher (If rider has > 1 order)
-                if (displayOrders.length > 1) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back_ios_rounded, size: 16),
-                          color: _currentOrderIndex > 0 ? AppColors.primary : AppColors.textMuted,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          onPressed: _currentOrderIndex > 0
-                              ? () => setState(() => _currentOrderIndex--)
-                              : null,
-                        ),
-                        Row(
-                          children: [
-                            const Icon(Icons.layers_outlined, size: 14, color: AppColors.primary),
-                            const SizedBox(width: 5),
-                            Text(
-                              'Order ${_currentOrderIndex + 1} of ${displayOrders.length}',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-                          color: _currentOrderIndex < displayOrders.length - 1
-                              ? AppColors.primary
-                              : AppColors.textMuted,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          onPressed: _currentOrderIndex < displayOrders.length - 1
-                              ? () => setState(() => _currentOrderIndex++)
-                              : null,
-                        ),
-                      ],
-                    ),
+    return Stack(
+      children: [
+        // 1. Live Interactive Route Map
+        Positioned.fill(
+          child: RouteMapWidget(
+            pickupLat: currentOrder.pickupLatitude,
+            pickupLng: currentOrder.pickupLongitude,
+            destinationLat: currentOrder.destinationLatitude,
+            destinationLng: currentOrder.destinationLongitude,
+          ),
+        ),
+
+        // 2. Vertically Draggable / Scrollable Bottom Sheet (Exact design from user screenshot!)
+        DraggableScrollableSheet(
+          initialChildSize: 0.58,
+          minChildSize: 0.35,
+          maxChildSize: 0.95,
+          snap: true,
+          snapSizes: const [0.35, 0.58, 0.90],
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.16),
+                    blurRadius: 18,
+                    offset: const Offset(0, -4),
                   ),
-                  const SizedBox(height: 12),
                 ],
-
-                // Order Header: ID + Status Badge
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          currentOrder.displayId,
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.textPrimary,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                        Text(
-                          'ETA: ${currentOrder.eta} • ${currentOrder.distance}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+              ),
+              child: ListView(
+                controller: scrollController,
+                padding: const EdgeInsets.fromLTRB(18, 10, 18, 24),
+                children: [
+                  // Drag Handle Bar
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 4.5,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFCBD5E1),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
                     ),
-                    StatusBadge(status: currentOrder.status),
-                  ],
-                ),
-                const SizedBox(height: 14),
-
-                // Customer Info & Direct 1-Tap Phone Call
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.border),
                   ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFEFF6FF),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.person, color: AppColors.primary, size: 18),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              currentOrder.customerName,
-                              style: const TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            Text(
-                              currentOrder.itemType,
-                              style: const TextStyle(
-                                fontSize: 11.5,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.phone_rounded, size: 15, color: Colors.white),
-                        label: const Text('Call', style: TextStyle(fontSize: 12, color: Colors.white)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.success,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        onPressed: () => _makePhoneCall(currentOrder.customerPhone),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 14),
+                  const SizedBox(height: 14),
 
-                // Route Stepper: Pickup & Dropoff
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      children: [
-                        Container(
-                          width: 10,
-                          height: 10,
-                          decoration: const BoxDecoration(
-                            color: AppColors.primary,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        Container(
-                          width: 2,
-                          height: 32,
-                          color: const Color(0xFFE2E8F0),
-                        ),
-                        Container(
-                          width: 10,
-                          height: 10,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF10B981),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  // If multiple orders, show switcher bar
+                  if (displayOrders.length > 1) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'PICKUP LOCATION',
-                            style: TextStyle(
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textMuted,
-                              letterSpacing: 0.5,
-                            ),
+                          IconButton(
+                            icon: const Icon(Icons.arrow_back_ios_rounded, size: 15),
+                            color: _currentOrderIndex > 0 ? AppColors.primary : AppColors.textMuted,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: _currentOrderIndex > 0
+                                ? () => setState(() => _currentOrderIndex--)
+                                : null,
                           ),
-                          Text(
-                            currentOrder.pickupLocation,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          Row(
+                            children: [
+                              const Icon(Icons.layers_outlined, size: 14, color: AppColors.primary),
+                              const SizedBox(width: 5),
+                              Text(
+                                'Active Order ${_currentOrderIndex + 1} of ${displayOrders.length}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 14),
-                          const Text(
-                            'DROPOFF LOCATION',
-                            style: TextStyle(
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textMuted,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          Text(
-                            currentOrder.dropoffLocation,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          IconButton(
+                            icon: const Icon(Icons.arrow_forward_ios_rounded, size: 15),
+                            color: _currentOrderIndex < displayOrders.length - 1
+                                ? AppColors.primary
+                                : AppColors.textMuted,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: _currentOrderIndex < displayOrders.length - 1
+                                ? () => setState(() => _currentOrderIndex++)
+                                : null,
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: 12),
                   ],
-                ),
-                const SizedBox(height: 16),
 
-                // Big Primary Action Button (Fits directly on the card)
-                if (currentOrder.status == DeliveryStatus.assigned) ...[
-                  CustomButton(
-                    text: 'ACCEPT DELIVERY',
-                    icon: Icons.check_circle_rounded,
-                    backgroundColor: AppColors.success,
-                    isLoading: _isAccepting,
-                    height: 48,
-                    onPressed: () => _acceptOrder(currentOrder),
-                  ),
-                ] else if (currentOrder.status == DeliveryStatus.accepted ||
-                    currentOrder.status == DeliveryStatus.arrivedAtPickup) ...[
-                  CustomButton(
-                    text: 'CONFIRM PICKUP',
-                    icon: Icons.inventory_2_rounded,
-                    backgroundColor: AppColors.primary,
-                    height: 48,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => PickupConfirmationScreen(order: currentOrder),
-                        ),
-                      );
-                    },
-                  ),
-                ] else if (currentOrder.status == DeliveryStatus.pickedUp ||
-                    currentOrder.status == DeliveryStatus.onTheWay) ...[
-                  CustomButton(
-                    text: 'CONTINUE / ON THE WAY',
-                    icon: Icons.navigation_rounded,
-                    backgroundColor: AppColors.primary,
-                    height: 48,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => OnTheWayScreen(order: currentOrder),
-                        ),
-                      );
-                    },
-                  ),
-                ] else if (currentOrder.status == DeliveryStatus.delivered ||
-                    currentOrder.status == DeliveryStatus.arrivedAtLocation) ...[
-                  CustomButton(
-                    text: 'ENTER CUSTOMER OTP',
-                    icon: Icons.pin_outlined,
-                    backgroundColor: AppColors.success,
-                    height: 48,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => OtpVerificationScreen(order: currentOrder),
-                        ),
-                      );
-                    },
-                  ),
+                  // 1. Customer Profile Row with circular Phone & SMS buttons (Matching Screenshot)
+                  _buildCustomerProfileRow(currentOrder),
+                  const SizedBox(height: 12),
+
+                  // 2. Status Banner Strip (Matching Screenshot)
+                  _buildStatusPillBanner(currentOrder),
+                  const SizedBox(height: 14),
+
+                  // 3. The Iconic Booking Card (Matching Screenshot)
+                  _buildScreenshotBookingCard(currentOrder),
+                  const SizedBox(height: 16),
+
+                  // 4. Primary Rider Action Button
+                  _buildActionButton(currentOrder),
+                  const SizedBox(height: 16),
+
+                  // 5. Special Notes / Items (Scrollable content)
+                  if (currentOrder.itemDescription.isNotEmpty || currentOrder.specialInstructions.isNotEmpty) ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.notes_rounded, size: 16, color: AppColors.primary),
+                              SizedBox(width: 6),
+                              Text(
+                                'Order Instructions & Note',
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            currentOrder.specialInstructions.isNotEmpty
+                                ? currentOrder.specialInstructions
+                                : currentOrder.itemDescription,
+                            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.35),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                  ],
+
+                  // 6. Other Active Orders in Vertical Scroll
+                  if (displayOrders.length > 1) ...[
+                    const Divider(height: 24, color: AppColors.border),
+                    const Text(
+                      'All Active Orders in Queue',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+                    ),
+                    const SizedBox(height: 10),
+                    ...displayOrders.asMap().entries.map((entry) {
+                      final order = entry.value;
+                      final isSelected = entry.key == _currentOrderIndex;
+                      return _buildCompactQueueCard(order, entry.key, isSelected);
+                    }),
+                  ],
                 ],
-              ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // SCREENSHOT MATCHING WIDGETS
+  // ---------------------------------------------------------------------------
+
+  // A. Customer / Receiver Row with circular black Phone & Message buttons
+  Widget _buildCustomerProfileRow(DeliveryOrder order) {
+    return Row(
+      children: [
+        // Avatar with stylish border
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF1F5F9),
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.border, width: 1.5),
+          ),
+          child: ClipOval(
+            child: Container(
+              color: const Color(0xFF1E293B),
+              child: const Icon(Icons.person, color: Colors.white, size: 26),
             ),
           ),
-          const SizedBox(height: 10),
+        ),
+        const SizedBox(width: 12),
+        // Customer Name & Rating
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Text(
+                    'Customer',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.star_rounded, size: 14, color: Color(0xFFF59E0B)),
+                  const SizedBox(width: 2),
+                  const Text(
+                    '4.9',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                order.customerName,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF0F172A),
+                  letterSpacing: -0.2,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        // Circular Black Phone Button
+        InkWell(
+          onTap: () => _makePhoneCall(order.customerPhone),
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            width: 42,
+            height: 42,
+            decoration: const BoxDecoration(
+              color: Color(0xFF1E293B),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.phone, color: Colors.white, size: 18),
+          ),
+        ),
+        const SizedBox(width: 10),
+        // Circular Black Chat / SMS Button
+        InkWell(
+          onTap: () => _sendSms(order.customerPhone),
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            width: 42,
+            height: 42,
+            decoration: const BoxDecoration(
+              color: Color(0xFF1E293B),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 18),
+          ),
+        ),
+      ],
+    );
+  }
 
-          // Quick Next Pager Hint Pill
-          Center(
-            child: TextButton.icon(
-              icon: const Text('Shift & Earnings', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
-              label: const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primary),
-              onPressed: () => _switchPage(1),
+  // B. Status Banner Strip (Matching Screenshot)
+  Widget _buildStatusPillBanner(DeliveryOrder order) {
+    Color bg = const Color(0xFFEFF6FF);
+    Color dot = const Color(0xFF2563EB);
+    String title = 'En route to destination';
+    String trailing = 'ETA: ${order.eta}';
+
+    if (order.status == DeliveryStatus.assigned) {
+      bg = const Color(0xFFFEF3C7);
+      dot = const Color(0xFFD97706);
+      title = 'Assigned for Pickup';
+      trailing = order.distance;
+    } else if (order.status == DeliveryStatus.arrivedAtPickup || order.status == DeliveryStatus.pickedUp) {
+      bg = const Color(0xFFEFF6FF);
+      dot = const Color(0xFF2563EB);
+      title = 'Package Picked Up';
+      trailing = 'Heading to Drop-off';
+    } else if (order.status == DeliveryStatus.arrivedAtLocation || order.status == DeliveryStatus.delivered) {
+      bg = const Color(0xFFDCFCE7);
+      dot = const Color(0xFF16A34A);
+      title = 'Arrived at Location';
+      trailing = 'OTP Required';
+    } else if (order.status == DeliveryStatus.completed) {
+      bg = const Color(0xFFDCFCE7);
+      dot = const Color(0xFF16A34A);
+      title = 'Delivered to ${order.receiverName.isNotEmpty ? order.receiverName : order.customerName}';
+      trailing = 'Signed for';
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: dot,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Text(
+            trailing,
+            style: TextStyle(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
+              color: dot.withValues(alpha: 0.8),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // C. Booking Card (Exact layout from user screenshot)
+  Widget _buildScreenshotBookingCard(DeliveryOrder order) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.border),
+        boxShadow: AppStyles.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Row 1: Booking Label + Display ID + Dark Status Badge
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Booking',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    order.displayId,
+                    style: const TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF0F172A),
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ],
+              ),
+              // Dark Status Chip (from screenshot)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F172A),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  order.status.displayName,
+                  style: const TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Row 2: Orange Dotted Stepper (from screenshot)
+          _buildDashedStepper(order.status),
+          const SizedBox(height: 16),
+
+          // Row 3: Details Grid + 3D Package Box Illustration
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // From -> To Row
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'From',
+                                style: TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                order.pickupLocation,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF0F172A),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'To',
+                                style: TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                order.dropoffLocation,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF0F172A),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Order Cost -> Customer Row
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Order Cost',
+                                style: TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'ETB ${order.paymentAmount.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF0F172A),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Customer',
+                                style: TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                order.customerName,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF0F172A),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+
+              // Stacked 3D Delivery Parcel Boxes (from screenshot)
+              _buildPackage3DGraphic(),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // D. Orange Dashed Stepper (4 dots with dotted lines connecting them)
+  Widget _buildDashedStepper(DeliveryStatus status) {
+    int currentStep = 1;
+    if (status == DeliveryStatus.arrivedAtPickup || status == DeliveryStatus.pickedUp) {
+      currentStep = 2;
+    } else if (status == DeliveryStatus.onTheWay || status == DeliveryStatus.arrivedAtLocation) {
+      currentStep = 3;
+    } else if (status == DeliveryStatus.delivered || status == DeliveryStatus.completed) {
+      currentStep = 4;
+    }
+
+    return Row(
+      children: [
+        _stepperDot(isActive: currentStep >= 1),
+        Expanded(child: _stepperDashedLine(isActive: currentStep >= 2)),
+        _stepperDot(isActive: currentStep >= 2),
+        Expanded(child: _stepperDashedLine(isActive: currentStep >= 3)),
+        _stepperDot(isActive: currentStep >= 3),
+        Expanded(child: _stepperDashedLine(isActive: currentStep >= 4)),
+        _stepperDot(isActive: currentStep >= 4),
+      ],
+    );
+  }
+
+  Widget _stepperDot({required bool isActive}) {
+    return Container(
+      width: 16,
+      height: 16,
+      decoration: BoxDecoration(
+        color: isActive ? const Color(0xFFEA580C) : const Color(0xFFE2E8F0),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: isActive ? const Color(0xFFC2410C) : const Color(0xFFCBD5E1),
+          width: 2,
+        ),
+      ),
+      child: isActive
+          ? const Center(
+              child: Icon(Icons.check, size: 9, color: Colors.white),
+            )
+          : null,
+    );
+  }
+
+  Widget _stepperDashedLine({required bool isActive}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: List.generate(
+        5,
+        (_) => Container(
+          width: 3.5,
+          height: 3.5,
+          decoration: BoxDecoration(
+            color: isActive ? const Color(0xFFEA580C) : const Color(0xFFCBD5E1),
+            shape: BoxShape.circle,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // E. 3D Delivery Box Illustration (Matching bottom right corner of screenshot)
+  Widget _buildPackage3DGraphic() {
+    return Container(
+      width: 68,
+      height: 56,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEF3C7),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFFDE68A), width: 1.5),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            bottom: 4,
+            right: 6,
+            child: Container(
+              width: 32,
+              height: 28,
+              decoration: BoxDecoration(
+                color: const Color(0xFFD97706),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Icon(Icons.inventory_2_rounded, color: Colors.white, size: 17),
+            ),
+          ),
+          Positioned(
+            top: 4,
+            left: 6,
+            child: Container(
+              width: 36,
+              height: 30,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF59E0B),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.14),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.all_inbox_rounded, color: Colors.white, size: 20),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // F. Big Rider Action Button
+  Widget _buildActionButton(DeliveryOrder order) {
+    if (order.status == DeliveryStatus.assigned) {
+      return CustomButton(
+        text: 'ACCEPT DELIVERY',
+        icon: Icons.check_circle_rounded,
+        backgroundColor: AppColors.success,
+        isLoading: _isAccepting,
+        height: 50,
+        onPressed: () => _acceptOrder(order),
+      );
+    } else if (order.status == DeliveryStatus.accepted ||
+        order.status == DeliveryStatus.arrivedAtPickup) {
+      return CustomButton(
+        text: 'CONFIRM PICKUP',
+        icon: Icons.inventory_2_rounded,
+        backgroundColor: AppColors.primary,
+        height: 50,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => PickupConfirmationScreen(order: order)),
+          );
+        },
+      );
+    } else if (order.status == DeliveryStatus.pickedUp ||
+        order.status == DeliveryStatus.onTheWay) {
+      return CustomButton(
+        text: 'CONTINUE / ON THE WAY',
+        icon: Icons.navigation_rounded,
+        backgroundColor: AppColors.primary,
+        height: 50,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => OnTheWayScreen(order: order)),
+          );
+        },
+      );
+    } else if (order.status == DeliveryStatus.delivered ||
+        order.status == DeliveryStatus.arrivedAtLocation) {
+      return CustomButton(
+        text: 'ENTER CUSTOMER OTP',
+        icon: Icons.pin_outlined,
+        backgroundColor: AppColors.success,
+        height: 50,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => OtpVerificationScreen(order: order)),
+          );
+        },
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  // G. Compact Card for Other Active Orders in Queue
+  Widget _buildCompactQueueCard(DeliveryOrder order, int index, bool isSelected) {
+    return GestureDetector(
+      onTap: () => setState(() => _currentOrderIndex = index),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFEFF6FF) : const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary : Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.two_wheeler_rounded,
+                color: isSelected ? Colors.white : AppColors.primary,
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    order.displayId,
+                    style: const TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    '${order.pickupLocation} ➔ ${order.dropoffLocation}',
+                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            StatusBadge(status: order.status),
+          ],
+        ),
       ),
     );
   }
